@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.plaf.FileChooserUI;
 import javax.swing.plaf.basic.BasicFileChooserUI;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,7 +48,11 @@ public class clientFrame implements ActionListener {
         tableModel=new DefaultTableModel();
         tableModel.addColumn("Filename");
         tableModel.addColumn("File size");
-        filedetailstable=new JTable(tableModel);
+        filedetailstable=new JTable(tableModel){
+            public TableCellEditor getCellEditor(int row, int column) {
+                return null; // Return null cell editor to make cells non-editable
+            }
+        };
         JScrollPane tablescrollpane = new JScrollPane(filedetailstable);
         tablescrollpane.setBounds(480,50,700,300);
         frame.add(tablescrollpane);

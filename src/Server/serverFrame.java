@@ -2,13 +2,16 @@ package Server;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 
-public class serverFrame implements ActionListener {
+public class serverFrame implements ActionListener, MouseListener {
     JFrame frame;
     JTable filedetailstable;
     DefaultTableModel tableModel;
@@ -42,10 +45,18 @@ public class serverFrame implements ActionListener {
         tableModel=new DefaultTableModel();
         tableModel.addColumn("Filename");
         tableModel.addColumn("File size");
-        filedetailstable=new JTable(tableModel);
+        filedetailstable=new JTable(tableModel){
+            public TableCellEditor getCellEditor(int row, int column) {
+                return null; // Return null cell editor to make cells non-editable
+            }
+        };
         JScrollPane tablescrollpane = new JScrollPane(filedetailstable);
         tablescrollpane.setBounds(480,50,700,300);
+        filedetailstable.addMouseListener(this);
         frame.add(tablescrollpane);
+
+
+
 
         JLabel sendfilelabel = new JLabel("Outgoing Files");
         sendfilelabel.setBounds(10,10,460,30);
@@ -54,6 +65,9 @@ public class serverFrame implements ActionListener {
         sendfilelabel.setBackground(Color.lightGray);
         sendfilelabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.getContentPane().add(sendfilelabel);
+
+
+
 
         chooseFLle = new JButton("choose file");
         chooseFLle.setBounds(10,50,150,30);
@@ -105,5 +119,40 @@ public class serverFrame implements ActionListener {
 //                client.passfiletosend(filetosend);
 //            }
 //        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(e.getSource()==filedetailstable){
+            int selectedRowIndex = filedetailstable.getSelectedRow();
+            if (selectedRowIndex != -1) {
+                String filename = (String) tableModel.getValueAt(selectedRowIndex, 0);
+                int fileSize = (int) tableModel.getValueAt(selectedRowIndex, 1);
+                System.out.println("selected row:" + filedetailstable.getSelectedRow());
+                System.out.println("Selected Filename: " + filename);
+                System.out.println("Selected File Size: " + fileSize);
+
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
