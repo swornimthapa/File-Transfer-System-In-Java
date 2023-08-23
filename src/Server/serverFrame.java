@@ -1,5 +1,8 @@
 package Server;
 
+import FIle.MyFile;
+import FIle.filePreview;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -131,6 +134,12 @@ public class serverFrame implements ActionListener, MouseListener {
                 System.out.println("selected row:" + filedetailstable.getSelectedRow());
                 System.out.println("Selected Filename: " + filename);
                 System.out.println("Selected File Size: " + fileSize);
+                int fileid = filedetailstable.getSelectedRow();
+                for(MyFile file:Server.filelist){
+                    if(fileid==file.getId()){
+                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+                    }
+                }
 
             }
         }

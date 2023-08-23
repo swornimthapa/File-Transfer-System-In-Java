@@ -11,7 +11,8 @@ import java.util.ArrayList;
 
 public class Server implements Runnable{
     serverFrame serverframe;
-    ArrayList<MyFile> filelist = new ArrayList<>();
+    int id=0;
+    public static ArrayList<MyFile> filelist = new ArrayList<>();
      public Server(){
           serverframe = new serverFrame();
           Thread thread = new Thread(this);
@@ -66,6 +67,10 @@ public class Server implements Runnable{
                                 }
                                 System.out.println("read contenet");
                                 serverframe.showfiledetails(filename, filecontentlenght);
+                                String fileExtension=getFileExtendion(filename);
+                                filelist.add(new MyFile(id,filename,filecontentbyte,fileExtension));
+
+                                id++;
 
                             }
                         }
@@ -77,5 +82,14 @@ public class Server implements Runnable{
         } catch (IOException e) {
             System.err.println("Error accepting client connection: " + e.getMessage());
         }
+    }
+
+    private String getFileExtendion(String filename) {
+         int i = filename.lastIndexOf('.');
+         if(i>0){
+             return filename.substring(i+1);
+         }else {
+             return "no extension found";
+         }
     }
 }
