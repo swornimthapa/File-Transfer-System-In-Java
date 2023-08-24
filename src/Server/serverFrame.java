@@ -4,6 +4,7 @@ import FIle.MyFile;
 import FIle.filePreview;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -12,6 +13,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class serverFrame implements ActionListener, MouseListener {
@@ -22,6 +26,10 @@ public class serverFrame implements ActionListener, MouseListener {
     JButton sendFile;
     JLabel subtitile;
     File filetosend;
+    JButton previewbutton;
+    JButton downloadbutton;
+    int previewSelectedrowindex;
+
     serverFrame(){
         frame =new JFrame("Server");
         frame.setResizable(false);
@@ -58,7 +66,15 @@ public class serverFrame implements ActionListener, MouseListener {
         filedetailstable.addMouseListener(this);
         frame.add(tablescrollpane);
 
+        previewbutton = new JButton("Preview");
+        previewbutton.setBounds(870,360,150,30);
+        previewbutton.addActionListener(this);
+        frame.getContentPane().add(previewbutton);
 
+        downloadbutton = new JButton("Download");
+        downloadbutton.setBounds(1030,360,150,30);
+        downloadbutton.addActionListener(this);
+        frame.getContentPane().add(downloadbutton);
 
 
         JLabel sendfilelabel = new JLabel("Outgoing Files");
@@ -106,6 +122,45 @@ public class serverFrame implements ActionListener, MouseListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(e.getSource()==previewbutton){
+            if (previewSelectedrowindex != -1) {
+                String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                int fileSize = (int) tableModel.getValueAt(previewSelectedrowindex, 1);
+                System.out.println("selected row:" + filedetailstable.getSelectedRow());
+                System.out.println("Selected Filename: " + filename);
+                System.out.println("Selected File Size: " + fileSize);
+                int fileid = filedetailstable.getSelectedRow();
+                for(MyFile file:Server.filelist){
+                    if(fileid==file.getId()){
+                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+                        break;
+                    }
+                }
+
+            }
+        }
+        if(e.getSource()==downloadbutton){
+            if(previewSelectedrowindex!=-1){
+                String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                int fileid = filedetailstable.getSelectedRow();
+                File filetodownload = new File(filename);
+                for(MyFile file:Server.filelist){
+                    if(fileid==file.getId()){
+                        try {
+                            FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
+                            fileOutputStream.write(file.getData());
+                            fileOutputStream.close();
+                        } catch (FileNotFoundException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                    break;
+                }
+            }
+
+        }
 //        if(e.getSource() == chooseFLle){
 //            JFileChooser jFileChooser = new JFileChooser();
 //            jFileChooser.setDialogTitle(" Chose a file to send");
@@ -127,21 +182,22 @@ public class serverFrame implements ActionListener, MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource()==filedetailstable){
-            int selectedRowIndex = filedetailstable.getSelectedRow();
-            if (selectedRowIndex != -1) {
-                String filename = (String) tableModel.getValueAt(selectedRowIndex, 0);
-                int fileSize = (int) tableModel.getValueAt(selectedRowIndex, 1);
-                System.out.println("selected row:" + filedetailstable.getSelectedRow());
-                System.out.println("Selected Filename: " + filename);
-                System.out.println("Selected File Size: " + fileSize);
-                int fileid = filedetailstable.getSelectedRow();
-                for(MyFile file:Server.filelist){
-                    if(fileid==file.getId()){
-                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
-                    }
-                }
-
-            }
+            previewSelectedrowindex=filedetailstable.getSelectedRow();
+//            int selectedRowIndex = filedetailstable.getSelectedRow();
+//            if (selectedRowIndex != -1) {
+//                String filename = (String) tableModel.getValueAt(selectedRowIndex, 0);
+//                int fileSize = (int) tableModel.getValueAt(selectedRowIndex, 1);
+//                System.out.println("selected row:" + filedetailstable.getSelectedRow());
+//                System.out.println("Selected Filename: " + filename);
+//                System.out.println("Selected File Size: " + fileSize);
+//                int fileid = filedetailstable.getSelectedRow();
+//                for(MyFile file:Server.filelist){
+//                    if(fileid==file.getId()){
+//                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+//                    }
+//                }
+//
+//            }
         }
     }
 
@@ -164,4 +220,5 @@ public class serverFrame implements ActionListener, MouseListener {
     public void mouseExited(MouseEvent e) {
 
     }
+
 }
