@@ -29,6 +29,7 @@ public class serverFrame implements ActionListener, MouseListener {
     JButton previewbutton;
     JButton downloadbutton;
     int previewSelectedrowindex;
+    public static boolean isDownloading=false;
 
     serverFrame(){
         frame =new JFrame("Server");
@@ -123,43 +124,55 @@ public class serverFrame implements ActionListener, MouseListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==previewbutton){
-            if (previewSelectedrowindex != -1) {
-                String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
-                int fileSize = (int) tableModel.getValueAt(previewSelectedrowindex, 1);
-                System.out.println("selected row:" + filedetailstable.getSelectedRow());
-                System.out.println("Selected Filename: " + filename);
-                System.out.println("Selected File Size: " + fileSize);
-                int fileid = filedetailstable.getSelectedRow();
-                for(MyFile file:Server.filelist){
-                    if(fileid==file.getId()){
-                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
-                        break;
+            if(!isDownloading){
+                if(tableModel.getRowCount()>0){
+                    if (previewSelectedrowindex != -1) {
+                        String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                        int fileSize = (int) tableModel.getValueAt(previewSelectedrowindex, 1);
+                        System.out.println("selected row:" + filedetailstable.getSelectedRow());
+                        System.out.println("Selected Filename: " + filename);
+                        System.out.println("Selected File Size: " + fileSize);
+                        int fileid = filedetailstable.getSelectedRow();
+                        for(MyFile file:Server.filelist){
+                            if(fileid==file.getId()){
+                                filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+                                break;
+                            }
+                        }
+
                     }
                 }
-
             }
+
         }
         if(e.getSource()==downloadbutton){
-            if(previewSelectedrowindex!=-1){
-                String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
-                int fileid = filedetailstable.getSelectedRow();
-                File filetodownload = new File(filename);
-                for(MyFile file:Server.filelist){
-                    if(fileid==file.getId()){
-                        try {
-                            FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
-                            fileOutputStream.write(file.getData());
-                            fileOutputStream.close();
-                        } catch (FileNotFoundException ex) {
-                            throw new RuntimeException(ex);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
+            if(!isDownloading){
+                if(tableModel.getRowCount()>0) {
+                    if (previewSelectedrowindex != -1) {
+                        String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                        System.out.println(filename);
+                        int fileid = filedetailstable.getSelectedRow();
+                        for (MyFile file : Server.filelist) {
+                            if (fileid == file.getId()) {
+                                try {
+                                    File filetodownload = new File(filename);
+                                    FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
+                                    fileOutputStream.write(file.getData());
+                                    fileOutputStream.close();
+                                } catch (FileNotFoundException ex) {
+                                    throw new RuntimeException(ex);
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }finally {
+                                    isDownloading=false;
+                                }
+                                break;
+                            }
                         }
                     }
-                    break;
                 }
-            }
 
+            }
         }
 //        if(e.getSource() == chooseFLle){
 //            JFileChooser jFileChooser = new JFileChooser();

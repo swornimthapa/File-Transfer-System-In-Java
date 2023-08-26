@@ -12,10 +12,12 @@ import java.util.ArrayList;
 public class Server implements Runnable{
     serverFrame serverframe;
     int id=0;
+    int portno;
     public static ArrayList<MyFile> filelist = new ArrayList<>();
-     public Server(){
+     public Server(String portno){
+          this.portno=Integer.parseInt(portno);
           serverframe = new serverFrame();
-          Thread thread = new Thread(this);
+          Thread thread = new Thread(this); // to seperate serverFrame and sever class
           thread.start();
     }
 
@@ -26,7 +28,7 @@ public class Server implements Runnable{
     @Override
     public void run() {
         try {
-            ServerSocket serverSocket = new ServerSocket(11223);
+            ServerSocket serverSocket = new ServerSocket(portno);
             while(true){
                 Socket clientsocket = serverSocket.accept();
                 System.out.println("a new clinet has connected "+clientsocket);
@@ -69,9 +71,7 @@ public class Server implements Runnable{
                                 serverframe.showfiledetails(filename, filecontentlenght);
                                 String fileExtension=getFileExtendion(filename);
                                 filelist.add(new MyFile(id,filename,filecontentbyte,fileExtension));
-
                                 id++;
-
                             }
                         }
                     }

@@ -1,4 +1,5 @@
 package FIle;
+import Server.serverFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -48,6 +49,7 @@ public class filePreview {
             jfilecontent.setIcon(new ImageIcon(filecontent));
         }else {
             JOptionPane.showMessageDialog(frame,"Cannot Show The Preview For this File","Error",JOptionPane.ERROR_MESSAGE);
+
         }
 
         jyes.addActionListener(new ActionListener() {
@@ -58,12 +60,16 @@ public class filePreview {
                     FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
                     fileOutputStream.write(filecontent);
                     fileOutputStream.close();
+
                     frame.dispose();
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
+                }finally {
+                    serverFrame.isDownloading = false;
                 }
+
             }
         });
         jno.addActionListener(new ActionListener() {

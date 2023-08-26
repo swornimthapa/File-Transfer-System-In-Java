@@ -10,11 +10,11 @@ public class Client implements Runnable{
     Thread thread;
     Socket socket;
 
-    public Client(){
+    public Client(String ipaddress,int portno){
 
         clientFrame clientFrame = new clientFrame(this);
         try {
-            socket = new Socket("localhost",11223);
+            socket = new Socket(ipaddress,portno);
         } catch (IOException e) {
             System.err.println("Error accepting client connection: " + e.getMessage());
         }
