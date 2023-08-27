@@ -1,5 +1,9 @@
 package Client;
 
+import FIle.MyFile;
+import FIle.filePreview;
+import Server.Server;
+
 import javax.swing.*;
 import javax.swing.plaf.FileChooserUI;
 import javax.swing.plaf.basic.BasicFileChooserUI;
@@ -8,18 +12,27 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-public class clientFrame implements ActionListener {
+public class clientFrame implements ActionListener, MouseListener {
     JFrame frame;
     JButton chooseFLle;
     JButton sendFile;
     JLabel subtitile;
     File filetosend;
+    JButton previewbutton;
+    JButton downloadbutton;
     Client client;
 //    JFileChooser jFileChooser;
     JTable filedetailstable;
     DefaultTableModel tableModel;
+    int previewSelectedrowindex;
+    public static boolean isDownloading=false;
     public clientFrame(Client clinet){
         this.client = clinet;
 
@@ -55,9 +68,18 @@ public class clientFrame implements ActionListener {
         };
         JScrollPane tablescrollpane = new JScrollPane(filedetailstable);
         tablescrollpane.setBounds(480,50,700,300);
+        filedetailstable.addMouseListener(this);
         frame.add(tablescrollpane);
 
+        previewbutton = new JButton("Preview");
+        previewbutton.setBounds(870,360,150,30);
+        previewbutton.addActionListener(this);
+        frame.getContentPane().add(previewbutton);
 
+        downloadbutton = new JButton("Download");
+        downloadbutton.setBounds(1030,360,150,30);
+        downloadbutton.addActionListener(this);
+        frame.getContentPane().add(downloadbutton);
 
         JLabel sendfilelabel = new JLabel("Outgoing Files");
         sendfilelabel.setBounds(10,10,460,30);
@@ -116,19 +138,66 @@ public class clientFrame implements ActionListener {
 
 
 
-
-
-
-
-
-
-
-
-
-
+    }
+    public void showfiledetails(String filename, int filesize ){
+        Object[] newRow = {filename,filesize};
+        tableModel.addRow(newRow);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(e.getSource()==previewbutton){
+            if(!isDownloading){
+                if(tableModel.getRowCount()>0){
+                    if (previewSelectedrowindex != -1) {
+                        String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                        int fileSize = (int) tableModel.getValueAt(previewSelectedrowindex, 1);
+                        System.out.println("selected row:" + filedetailstable.getSelectedRow());
+                        System.out.println("Selected Filename: " + filename);
+                        System.out.println("Selected File Size: " + fileSize);
+                        int fileid = filedetailstable.getSelectedRow();
+                        for(MyFile file: Client.filelist){
+                            if(fileid==file.getId()){
+                                filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        }
+        if(e.getSource()==downloadbutton){
+            if(!isDownloading){
+                if(tableModel.getRowCount()>0) {
+                    if (previewSelectedrowindex != -1) {
+                        String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                        System.out.println(filename);
+                        int fileid = filedetailstable.getSelectedRow();
+                        for (MyFile file : Client.filelist) {
+                            if (fileid == file.getId()) {
+                                try {
+                                    File filetodownload = new File(filename);
+                                    FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
+                                    fileOutputStream.write(file.getData());
+                                    fileOutputStream.close();
+                                } catch (FileNotFoundException ex) {
+                                    throw new RuntimeException(ex);
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }finally {
+                                    isDownloading=false;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        //for sending file
         if(e.getSource() == chooseFLle){
             JFileChooser jFileChooser = new JFileChooser();
             jFileChooser.setDialogTitle(" Chose a file to send");
@@ -161,6 +230,46 @@ public class clientFrame implements ActionListener {
 //                client.passfiletosend(filetosend);
 //            }
 //        }
+    public void mouseClicked(MouseEvent e) {
+        if(e.getSource()==filedetailstable){
+            previewSelectedrowindex=filedetailstable.getSelectedRow();
+//            int selectedRowIndex = filedetailstable.getSelectedRow();
+//            if (selectedRowIndex != -1) {
+//                String filename = (String) tableModel.getValueAt(selectedRowIndex, 0);
+//                int fileSize = (int) tableModel.getValueAt(selectedRowIndex, 1);
+//                System.out.println("selected row:" + filedetailstable.getSelectedRow());
+//                System.out.println("Selected Filename: " + filename);
+//                System.out.println("Selected File Size: " + fileSize);
+//                int fileid = filedetailstable.getSelectedRow();
+//                for(MyFile file:Server.filelist){
+//                    if(fileid==file.getId()){
+//                        filePreview preview = new filePreview(file.getName(),file.getData(),file.getFileExtension());
+//                    }
+//                }
+//
+//            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
 
 
 }
