@@ -1,4 +1,5 @@
 package FIle;
+import Client.clientFrame;
 import Server.serverFrame;
 
 import javax.swing.*;
@@ -68,6 +69,7 @@ public class filePreview {
                     throw new RuntimeException(ex);
                 }finally {
                     serverFrame.isDownloading = false;
+                    clientFrame.isDownloading=false;
                 }
 
             }

@@ -28,10 +28,13 @@ public class serverFrame implements ActionListener, MouseListener {
     File filetosend;
     JButton previewbutton;
     JButton downloadbutton;
+    Server server;
     int previewSelectedrowindex;
     public static boolean isDownloading=false;
 
-    serverFrame(){
+    serverFrame(Server server){
+        this.server=server;
+
         frame =new JFrame("Server");
         frame.setResizable(false);
         frame.setSize(1200,700);
@@ -123,6 +126,7 @@ public class serverFrame implements ActionListener, MouseListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        //for receiving file
         if(e.getSource()==previewbutton){
             if(!isDownloading){
                 if(tableModel.getRowCount()>0){
@@ -171,6 +175,25 @@ public class serverFrame implements ActionListener, MouseListener {
                         }
                     }
                 }
+
+            }
+        }
+
+        //for sending file
+        if(e.getSource() == chooseFLle){
+            JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setDialogTitle(" Chose a file to send");
+            if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
+                filetosend = jFileChooser.getSelectedFile();  //filetosend will have the path of the selected file
+                subtitile.setText(filetosend.getName());
+            }
+        }
+        if(e.getSource()==sendFile){
+            if(filetosend==null){
+                subtitile.setText("please select a file to send first");
+            }else{
+                System.out.println("dfsf");
+                server.passfiletosend(filetosend);
 
             }
         }
