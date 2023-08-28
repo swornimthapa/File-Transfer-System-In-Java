@@ -103,7 +103,7 @@ public class Server implements Runnable{
                             out.write(filenamebyte);
 
                             out.writeInt(filecontentbyte.length);
-                            out.write(filecontentbyte);
+                                 out.write(filecontentbyte);
 
                             filetosend=null;
                         }

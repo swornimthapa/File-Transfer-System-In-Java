@@ -4,6 +4,9 @@ import Client.Client;
 import Client.clientFrame;
 import Server.Server;
 import  Server.serverFrame;
+import UI_elements.RoundedButton;
+import UI_elements.RoundedPanel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -65,6 +68,18 @@ public class Window implements ActionListener {
         startserver.setBounds(80,300,150,30);
         frame.add(startserver);
         startserver.addActionListener(this);
+
+        //example
+        RoundedButton b = new RoundedButton("test",20);
+        b.setBounds(10,10,150,30);
+        b.setBackground(Color.RED);
+        b.setBorder(BorderFactory.createLineBorder(Color.white));
+        frame.getContentPane().add(b);
+
+
+        RoundedPanel paneltest  = new RoundedPanel(30);
+        paneltest.setBounds(5,5,200,200);
+        frame.add(paneltest);
 
     }
 
