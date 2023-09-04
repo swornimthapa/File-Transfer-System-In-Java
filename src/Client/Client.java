@@ -14,17 +14,19 @@ import java.util.HashSet;
 
 public class Client implements Runnable{
     clientFrame clientFrame;
-    File filetosend ;
     Thread thread;
     Socket socket;
-    int id=0;
-    Runnable r2;
+    int countselectedfiles=0;
+    int numberoffilestosend=0;
     Runnable threadfordownloadrequest;
     Runnable threadfordownloadallrequest;
+    Runnable filecontentsendthred;
+    Runnable r2;
     String downloadFolder;
+    File[] filetosendarray ;
     File filefordownload; //contains the name of file to download
-    //    public static ArrayList<MyFile> filelist = new ArrayList<>();
     public static ArrayList<File> receivedFIlelist = new ArrayList<>();
+    ArrayList<File> filecontenttosendnamearray = new ArrayList<>();
     ArrayList<File> toDownloadfilelist = new ArrayList<>();
     HashSet<File> alreadyDownloadedfilelist = new HashSet<>();
     boolean isListenig=false;
@@ -42,16 +44,20 @@ public class Client implements Runnable{
 
 
     }
-    //    public void passfiletosend(File filetosend){
-//        this.filetosend = filetosend;
-//        Thread thread2=new Thread(r2);
-//        thread2.start();
-//    }
+    public void passfiletosend(File[] filetosend){
+        this.filetosendarray = filetosend;
+        countselectedfiles=0;
+        for(int i=0;i<filetosendarray.length;i++){
+            countselectedfiles++;
+        }
+        Thread thread2=new Thread(r2);
+        thread2.start();
+    }
     public void sendrequestfordownload(File filename,String downloadFolder){
         this.downloadFolder = downloadFolder;
         this.filefordownload = filename;
-        Thread thread3 = new Thread(threadfordownloadrequest);
-        thread3.start();
+        Thread thread4 = new Thread(threadfordownloadrequest);
+        thread4.start();
     }
     public void downloadall(String downloadFolder) {
         this.downloadFolder = downloadFolder;
@@ -60,15 +66,14 @@ public class Client implements Runnable{
                 toDownloadfilelist.add(file);
             }
         }
-        Thread thread4 = new Thread(threadfordownloadallrequest);
-        thread4.start();
+        Thread thread5 = new Thread(threadfordownloadallrequest);
+        thread5.start();
 
     }
     @Override
     public void run() {
         try {
             while(true){
-//                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 //for receiving file
                 Runnable r1 = () -> {
                     DataInputStream dataInputStream = null;
@@ -97,6 +102,7 @@ public class Client implements Runnable{
                             String status = new String(statusbyte);
 
                             switch (status){
+                                //for receiving file info sent by the peer
                                 case "SEND_FILE_INFO":
                                     int numberOffiles=0;
                                     try {
@@ -125,7 +131,6 @@ public class Client implements Runnable{
                                             String filename = new String(filenamebyte);
                                             File file = new File(filename);
 
-
                                             //receives size of the file
                                             int filezsize=0;
                                             try {
@@ -134,14 +139,12 @@ public class Client implements Runnable{
                                                 throw new RuntimeException(e);
                                             }
                                             receivedFIlelist.add(file);
-//                                            alreadyDownloadedfilelist.add(file);
                                             clientFrame.showfiledetails(file.getName(), filezsize);
-
-
                                         }
                                     }
                                     break;
                                 case "FILE_CONTENT"  :
+                                    //for receving and downloading file content sent
                                     int numberOffilecontenttoget=0;
                                     try {
                                         numberOffilecontenttoget = dataInputStream.readInt();
@@ -167,7 +170,6 @@ public class Client implements Runnable{
                                             }
                                             String filename = new String(filenamebyte);
 
-
                                             try{
                                                 long size = dataInputStream.readLong(); // read file size
                                                 String direcotry = downloadFolder + "/" + filename;
@@ -180,8 +182,6 @@ public class Client implements Runnable{
                                                 }
                                                 // Here we received file
                                                 System.out.println("File is Received");
-
-
 //                                        FileOutputStream fileOut = new FileOutputStream(filename);
 //                                        byte[] buffer = new byte[1024];
 //                                        int bytesRead;
@@ -192,7 +192,6 @@ public class Client implements Runnable{
 //                                            fileOut.write(buffer, 0, bytesRead);
 //                                        }
                                                 fileOut.close();
-//                                        filename= null;
                                             } catch (FileNotFoundException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IOException e) {
@@ -200,6 +199,30 @@ public class Client implements Runnable{
                                             }
                                         }
 
+                                    }
+                                    break;
+                                //for receiving download request files and sending download through filecontentsendthread
+                                case "SEND_FOR_DOWNLOAD":
+                                    try {
+                                        numberoffilestosend=dataInputStream.readInt();
+                                        for(int i=0;i<numberoffilestosend;i++) {
+                                            int filenamelength = 0;
+                                            filenamelength = dataInputStream.readInt();
+                                            if (filenamelength > 0) {
+                                                byte[] filenamebyte = new byte[filenamelength];
+                                                dataInputStream.readFully(filenamebyte, 0, filenamelength);
+                                                String filename = new String(filenamebyte);
+                                                File filecontenttosendname = new File(filename);
+                                                filecontenttosendnamearray.add(filecontenttosendname);
+                                                System.out.println(filename);
+
+
+                                            }
+                                        }
+                                        Thread thread3 = new Thread(filecontentsendthred);
+                                        thread3.start();
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
                                     }
                                     break;
                             }
@@ -210,9 +233,8 @@ public class Client implements Runnable{
 
                     }
                     isListenig=false;
-
                 };
-
+                //for sending the file name/ request for download all
                 threadfordownloadallrequest = () -> {
                     if(!isSending){
                         isSending=true;
@@ -244,7 +266,7 @@ public class Client implements Runnable{
                         System.err.println("A process of sending  files is in process");
                     }
                 };
-
+                //for sending file names / request for selected download
                 threadfordownloadrequest = () ->{
                     if(!isSending){
                         isSending=true;
@@ -272,33 +294,121 @@ public class Client implements Runnable{
                         isSending=false;
                     }else {
                         System.err.println("A process of sending  files is in process");
+                    }
+                };
+                //for sending file content
+                filecontentsendthred = () ->
+                {
+                    if(!isSending){
+                        isSending=true;
+                        try{
+                            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+
+                            //sending status
+                            String status = "FILE_CONTENT";
+                            byte[] statusbyte = status.getBytes();
+                            out.writeInt(statusbyte.length);
+                            out.write(statusbyte);
+
+                            out.writeInt(numberoffilestosend);
+
+                            for(int i=0;i<numberoffilestosend;i++){
+                                FileInputStream fileInputStream  = new FileInputStream(filecontenttosendnamearray.get(i));
+
+
+                                String filename = filecontenttosendnamearray.get(i).getName();
+                                byte[] filenamebyte = filename.getBytes();
+                                out.writeInt(filenamebyte.length);
+                                out.write(filenamebyte);
+
+                                out.writeLong(filecontenttosendnamearray.get(i).length());
+
+                                byte[] buffer = new byte[1024];
+                                int bytesRead;
+                                int pos = 0;
+//                        while ((bytesRead = fileInputStream.read(buffer, 0, 1024)) >= 0) {
+//                            out.write(buffer, 0, bytesRead);
+//                            out.flush();
+//                            pos += bytesRead;
+////                            System.out.println(pos + " bytes (" + bytesRead + " bytes read)");
+//                        }
+                                while ((bytesRead = fileInputStream.read(buffer))
+                                        != -1) {
+                                    // Send the file to Server Socket
+                                    out.write(buffer, 0, bytesRead);
+                                    out.flush();
+                                }
+                                fileInputStream.close();
+                            }
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        filecontenttosendnamearray.clear();
+                    }else {
+                        System.err.println("A process of sending files is in process");
+                    }
+                    isSending=false;
+
+                };
+                //                for sending file info to the peers
+                r2 = () -> {
+                    if(!isSending){
+                        isSending=true;
+                        try {
+                            System.out.println(filetosendarray);
+                            if(filetosendarray!=null){
+                                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+                                //sending status of f
+                                String status = "SEND_FILE_INFO";
+                                byte[] statusbyte = status.getBytes();
+                                out.writeInt(statusbyte.length);
+                                out.write(statusbyte);
+
+                                out.writeInt(filetosendarray.length);
+                                for(File filetosend : filetosendarray){
+
+                                    String filename = filetosend.getAbsolutePath();
+                                    byte[] filenamebyte = filename.getBytes();
+                                    out.writeInt(filenamebyte.length);
+                                    out.write(filenamebyte);
+
+                                    //sending the size of file in bytes
+                                    out.writeInt((int) filetosend.length());
+                                    filetosend=null;
+                                }
+                            }
+                        } catch (IOException e) {
+                            System.err.println("Error accepting clinet connection: " + e.getMessage());
+                        }
+                        isSending=false;
+                    }else {
+                        System.err.println("A process of sending and receiving files is in process");
 
                     }
 
                 };
-
-
                 Thread thread1=new Thread(r1);
                 thread1.start();
                 thread1.join();
                 break;
-
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    private String getFileExtendion(String filename) {
-        int i = filename.lastIndexOf('.');
-        if(i>0){
-            return filename.substring(i+1);
-        }else {
-            return "no extension found";
-        }
-    }
-
+//    private String getFileExtendion(String filename) {
+//        int i = filename.lastIndexOf('.');
+//        if(i>0){
+//            return filename.substring(i+1);
+//        }else {
+//            return "no extension found";
+//        }
+//    }
 
 }
 
