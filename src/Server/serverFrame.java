@@ -21,11 +21,13 @@ import java.io.IOException;
 public class serverFrame implements ActionListener, MouseListener {
     JFrame frame;
     JTable filedetailstable;
+    JTable selectedfiledetailstable;
     DefaultTableModel tableModel;
+    DefaultTableModel selectedtableModel;
     JButton chooseFLle;
     JButton sendFile;
     JLabel subtitile;
-    File filetosend;
+    File[] filetosend;
     JButton previewbutton;
     JButton downloadbutton;
     Server server;
@@ -49,7 +51,7 @@ public class serverFrame implements ActionListener, MouseListener {
 
     private void initializecomponents() {
         JLabel recivedfilelable = new JLabel("Incomming Files");
-        recivedfilelable.setBounds(480,10,700,30);
+        recivedfilelable.setBounds(670,10,500,30);
         recivedfilelable.setOpaque(true);
         recivedfilelable.setBackground(Color.lightGray);
         recivedfilelable.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -66,9 +68,26 @@ public class serverFrame implements ActionListener, MouseListener {
             }
         };
         JScrollPane tablescrollpane = new JScrollPane(filedetailstable);
-        tablescrollpane.setBounds(480,50,700,300);
+        tablescrollpane.setBounds(670,50,500,300);
         filedetailstable.addMouseListener(this);
         frame.add(tablescrollpane);
+
+
+        selectedtableModel=new DefaultTableModel();
+        selectedtableModel.addColumn("Filename");
+        selectedtableModel.addColumn("File size");
+        selectedfiledetailstable=new JTable(selectedtableModel){
+            public TableCellEditor getCellEditor(int row, int column) {
+                return null; // Return null cell editor to make cells non-editable
+            }
+        };
+        JScrollPane selectedtablescrollpane = new JScrollPane(selectedfiledetailstable);
+        selectedtablescrollpane.setBounds(10,50,500,300);
+//        filedetailstable.addMouseListener(this);
+        frame.add(selectedtablescrollpane);
+
+
+
 
         previewbutton = new JButton("Preview");
         previewbutton.setBounds(870,360,150,30);
@@ -93,27 +112,27 @@ public class serverFrame implements ActionListener, MouseListener {
 
 
         chooseFLle = new JButton("choose file");
-        chooseFLle.setBounds(10,50,150,30);
+        chooseFLle.setBounds(10,360,150,30);
         chooseFLle.addActionListener(this);
         frame.add(chooseFLle);
 
 
-        JLabel filetosendlabel = new JLabel("File To Send");
-        filetosendlabel.setBounds(10,280,150,30);
-        filetosendlabel.setHorizontalAlignment(JLabel.CENTER);
-        filetosendlabel.setOpaque(true);
-        filetosendlabel.setBackground(Color.lightGray);
-        filetosendlabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        frame.getContentPane().add(filetosendlabel);
+//        JLabel filetosendlabel = new JLabel("File To Send");
+//        filetosendlabel.setBounds(10,280,150,30);
+//        filetosendlabel.setHorizontalAlignment(JLabel.CENTER);
+//        filetosendlabel.setOpaque(true);
+//        filetosendlabel.setBackground(Color.lightGray);
+//        filetosendlabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//        frame.getContentPane().add(filetosendlabel);
 
-        subtitile = new JLabel("File To Send Not Selected");
-        subtitile.setBounds(170,280,300,30);
-        subtitile.setHorizontalAlignment(JLabel.CENTER);
-        subtitile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        frame.add(subtitile);
+//        subtitile = new JLabel("File To Send Not Selected");
+//        subtitile.setBounds(170,280,300,30);
+//        subtitile.setHorizontalAlignment(JLabel.CENTER);
+//        subtitile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//        frame.add(subtitile);
 
         sendFile = new JButton("send file");
-        sendFile.setBounds(320,320,150,30);
+        sendFile.setBounds(320,360,150,30);
         sendFile.addActionListener(this);
         frame.add(sendFile);
 
@@ -122,6 +141,15 @@ public class serverFrame implements ActionListener, MouseListener {
     public void showfiledetails(String filename, int filesize ){
        Object[] newRow = {filename,filesize};
        tableModel.addRow(newRow);
+    }
+    public void showSelecteffiledetails(File[] file){
+        for(File filetemp :file){
+            String filename = filetemp.getName();
+            int filesize = (int) filetemp.length();
+            System.out.println(filename+filesize);
+            Object[] newRow = {filename,filesize};
+            selectedtableModel.addRow(newRow);
+        }
     }
 
     @Override
@@ -155,24 +183,25 @@ public class serverFrame implements ActionListener, MouseListener {
                     if (previewSelectedrowindex != -1) {
                         String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
                         System.out.println(filename);
-                        int fileid = filedetailstable.getSelectedRow();
-                        for (MyFile file : Server.filelist) {
-                            if (fileid == file.getId()) {
-                                try {
-                                    File filetodownload = new File(filename);
-                                    FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
-                                    fileOutputStream.write(file.getData());
-                                    fileOutputStream.close();
-                                } catch (FileNotFoundException ex) {
-                                    throw new RuntimeException(ex);
-                                } catch (IOException ex) {
-                                    throw new RuntimeException(ex);
-                                }finally {
-                                    isDownloading=false;
-                                }
-                                break;
-                            }
-                        }
+//                        int fileid = filedetailstable.getSelectedRow();
+
+//                        for (MyFile file : Server.filelist) {
+//                            if (fileid == file.getId()) {
+//                                try {
+//                                    File filetodownload = new File(filename);
+//                                    FileOutputStream fileOutputStream = new FileOutputStream(filetodownload);
+//                                    fileOutputStream.write(file.getData());
+//                                    fileOutputStream.close();
+//                                } catch (FileNotFoundException ex) {
+//                                    throw new RuntimeException(ex);
+//                                } catch (IOException ex) {
+//                                    throw new RuntimeException(ex);
+//                                }finally {
+//                                    isDownloading=false;
+//                                }
+//                                break;
+//                            }
+//                        }
                     }
                 }
 
@@ -181,38 +210,27 @@ public class serverFrame implements ActionListener, MouseListener {
 
         //for sending file
         if(e.getSource() == chooseFLle){
+
             JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setMultiSelectionEnabled(true);
             jFileChooser.setDialogTitle(" Chose a file to send");
             if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
-                filetosend = jFileChooser.getSelectedFile();  //filetosend will have the path of the selected file
-                subtitile.setText(filetosend.getName());
+                selectedtableModel.setRowCount(0);
+                filetosend = jFileChooser.getSelectedFiles();  //filetosend will have the path of the selected file
+//                subtitile.setText(filetosend.getName());
+                showSelecteffiledetails(filetosend);
             }
         }
         if(e.getSource()==sendFile){
             if(filetosend==null){
-                subtitile.setText("please select a file to send first");
+                System.out.println("please select a file to send first");
+//                subtitile.setText("please select a file to send first");
             }else{
                 System.out.println("dfsf");
                 server.passfiletosend(filetosend);
 
             }
         }
-//        if(e.getSource() == chooseFLle){
-//            JFileChooser jFileChooser = new JFileChooser();
-//            jFileChooser.setDialogTitle(" Chose a file to send");
-//            if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
-//                filetosend = jFileChooser.getSelectedFile();  //filetosend will have the path of the selected file
-//                subtitile.setText(filetosend.getName());
-//            }
-//        }
-//        if(e.getSource()==sendFile){
-//            if(filetosend==null){
-//                subtitile.setText("please select a file to send first");
-//            }else{
-//                System.out.println("dfsf");
-//                client.passfiletosend(filetosend);
-//            }
-//        }
     }
 
     @Override
