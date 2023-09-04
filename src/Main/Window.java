@@ -48,7 +48,6 @@ public class Window implements ActionListener {
         iplabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.add(iplabel);
 
-
         iptextfield=new JTextField();
         iptextfield.setBounds(670,110,200,30);
         frame.add(iptextfield);
@@ -71,16 +70,17 @@ public class Window implements ActionListener {
         startserver.addActionListener(this);
 
         //example
-//        RoundedButton b = new RoundedButton("test",20);
-//        b.setBounds(10,10,150,30);
-//        b.setBackground(Color.RED);
-//        b.setBorder(BorderFactory.createLineBorder(Color.white));
-//        frame.getContentPane().add(b);
-//
-//
-//        RoundedPanel paneltest  = new RoundedPanel(30);
-//        paneltest.setBounds(5,5,200,200);
-//        frame.add(paneltest);
+        RoundedButton b = new RoundedButton("test",20);
+        b.setBounds(10,10,150,30);
+        b.setBackground(Color.RED);
+        b.setBorder(BorderFactory.createLineBorder(Color.white));
+        frame.getContentPane().add(b);
+
+
+        RoundedPanel paneltest  = new RoundedPanel(30);
+        paneltest.setBounds(5,5,200,200);
+        frame.add(paneltest);
+
     }
 
     @Override
