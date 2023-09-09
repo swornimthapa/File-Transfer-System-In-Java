@@ -36,10 +36,13 @@ public class Client implements Runnable{
         clientFrame = new clientFrame(this);
         try {
             socket = new Socket(ipaddress,portno);
+            clientFrame.displayGoodconnectionstatus("A new cilent has conncted : " + socket);
             thread= new Thread(this);
             thread.start();
         } catch (IOException e) {
             System.err.println("Error accepting client connection: " + e.getMessage() + " : Restart with correct IP and Port Number");
+            clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage() + " : Restart with correct IP and Port Number");
+
         }
 
 
@@ -91,6 +94,7 @@ public class Client implements Runnable{
                                 statuslenght = dataInputStream.readInt();
                             } catch (IOException e) {
                                 System.err.println("Error accepting client connection: " + e.getMessage() + ": Check if the Host is Running And Restart Your Application");
+                                clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Host is Running And Restart Your Application");
                                 break;
                             }
                             byte[] statusbyte = new byte[statuslenght];
@@ -118,6 +122,8 @@ public class Client implements Runnable{
                                             filenamelenght = dataInputStream.readInt();
                                         } catch (IOException e) {
                                             System.err.println("Error accepting client connection: " + e.getMessage());
+                                            clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage());
+
                                             break;
                                         }
                                         if (filenamelenght > 0) {
@@ -126,6 +132,8 @@ public class Client implements Runnable{
                                                 dataInputStream.readFully(filenamebyte, 0, filenamelenght);
                                             } catch (IOException e) {
                                                 System.err.println("Error accepting client connection: " + e.getMessage());
+                                                clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage());
+
                                                 break;
                                             }
                                             String filename = new String(filenamebyte);
@@ -158,6 +166,8 @@ public class Client implements Runnable{
                                             filenamelenght = dataInputStream.readInt();
                                         } catch (IOException e) {
                                             System.err.println("Error accepting client connection: " + e.getMessage());
+                                            clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage());
+
                                             break;
                                         }
                                         if(filenamelenght>0){
@@ -166,6 +176,8 @@ public class Client implements Runnable{
                                                 dataInputStream.readFully(filenamebyte, 0, filenamelenght);
                                             } catch (IOException e) {
                                                 System.err.println("Error accepting client connection: " + e.getMessage());
+                                                clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage());
+
                                                 break;
                                             }
                                             String filename = new String(filenamebyte);
@@ -175,11 +187,14 @@ public class Client implements Runnable{
                                                 String direcotry = downloadFolder + "/" + filename;
                                                 FileOutputStream fileOut = new FileOutputStream(direcotry);
                                                 byte[] buffer = new byte[1024];
+                                                clientFrame.displayReceivingStatus(filename,"RECEIVING_CONTENT");
                                                 while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
                                                     // Here we write the file using write method
                                                     fileOut.write(buffer, 0, bytes);
                                                     size -= bytes; // read upto file size
                                                 }
+                                                clientFrame.displayReceivingStatus(filename,"RECEIVED_CONTENT");
+
                                                 // Here we received file
                                                 System.out.println("File is Received");
 //                                        FileOutputStream fileOut = new FileOutputStream(filename);
@@ -229,6 +244,8 @@ public class Client implements Runnable{
                             isListenig=false;
                         }else{
                             System.err.println("A process of  receiving files is in process");
+                            clientFrame.displayBadconnectionstatus("A process of  receiving files is in process");
+                            break;
                         }
 
                     }
@@ -264,6 +281,8 @@ public class Client implements Runnable{
                         isSending=false;
                     }else {
                         System.err.println("A process of sending  files is in process");
+                        clientFrame.displayBadconnectionstatus("A process of sending  files is in process");
+
                     }
                 };
                 //for sending file names / request for selected download
@@ -294,6 +313,8 @@ public class Client implements Runnable{
                         isSending=false;
                     }else {
                         System.err.println("A process of sending  files is in process");
+                        clientFrame.displayBadconnectionstatus("A process of sending  files is in process");
+
                     }
                 };
                 //for sending file content
@@ -332,13 +353,15 @@ public class Client implements Runnable{
 //                            out.flush();
 //                            pos += bytesRead;
 ////                            System.out.println(pos + " bytes (" + bytesRead + " bytes read)");
-//                        }
+                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENDING");
                                 while ((bytesRead = fileInputStream.read(buffer))
                                         != -1) {
                                     // Send the file to Server Socket
                                     out.write(buffer, 0, bytesRead);
                                     out.flush();
                                 }
+                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENT");
+
                                 fileInputStream.close();
                             }
                         } catch (FileNotFoundException e) {
@@ -349,6 +372,8 @@ public class Client implements Runnable{
                         filecontenttosendnamearray.clear();
                     }else {
                         System.err.println("A process of sending files is in process");
+                        clientFrame.displayBadconnectionstatus("A process of sending files is in process");
+
                     }
                     isSending=false;
 
@@ -379,14 +404,19 @@ public class Client implements Runnable{
                                     //sending the size of file in bytes
                                     out.writeInt((int) filetosend.length());
                                     filetosend=null;
+                                    clientFrame.displaySendingstatus(filename,"FILE_INFO_SENT");
+
                                 }
                             }
                         } catch (IOException e) {
                             System.err.println("Error accepting clinet connection: " + e.getMessage());
+                            clientFrame.displayBadconnectionstatus("Error accepting clinet connection: " + e.getMessage());
+
                         }
                         isSending=false;
                     }else {
                         System.err.println("A process of sending and receiving files is in process");
+                        clientFrame.displayBadconnectionstatus("A process of sending and receiving files is in process");
 
                     }
 
