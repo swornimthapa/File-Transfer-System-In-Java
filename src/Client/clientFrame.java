@@ -2,6 +2,10 @@ package Client;
 
 
 
+import UI_elements.RoundedButton;
+import UI_elements.RoundedLabel;
+import UI_elements.RoundedPanel;
+
 import javax.swing.*;
 
 import javax.swing.border.EmptyBorder;
@@ -57,15 +61,23 @@ public class clientFrame implements ActionListener, MouseListener {
     }
 
     private void initializeComponent() {
-        JLabel recivedfilelable = new JLabel("Incomming Files");
-        recivedfilelable.setBounds(670,10,500,30);
-        recivedfilelable.setOpaque(true);
-        recivedfilelable.setBackground(Color.lightGray);
-        recivedfilelable.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        RoundedLabel recivedfilelable = new RoundedLabel("Incomming Files",30);
+        recivedfilelable.setBounds(820,25,150,30);
+//            recivedfilelable.setOpaque(true);
+        recivedfilelable.setBackground(Color.decode("#00563E"));
+        recivedfilelable.setForeground(Color.white);
+        recivedfilelable.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
         recivedfilelable.setHorizontalAlignment(JLabel.CENTER);
         frame.getContentPane().add(recivedfilelable);
 
-
+//            JLabel recivedfilelable = new JLabel("Incomming Files");
+//            recivedfilelable.setBounds(670,10,500,30);
+//            recivedfilelable.setOpaque(true);
+//            recivedfilelable.setBackground(Color.lightGray);
+//            recivedfilelable.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//            recivedfilelable.setHorizontalAlignment(JLabel.CENTER);
+//            frame.getContentPane().add(recivedfilelable);
+        //for incomming
         tableModel=new DefaultTableModel();
         tableModel.addColumn("Filename");
         tableModel.addColumn("File size");
@@ -74,11 +86,44 @@ public class clientFrame implements ActionListener, MouseListener {
                 return null; // Return null cell editor to make cells non-editable
             }
         };
+        filedetailstable.setBackground(Color.white);
+
         JScrollPane tablescrollpane = new JScrollPane(filedetailstable);
-        tablescrollpane.setBounds(670,50,500,200);
+        tablescrollpane.setBounds(640,60,500,200);
+        tablescrollpane.setBackground(Color.white);
+        tablescrollpane.getViewport().setBackground(Color.WHITE);
+        tablescrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//            tablescrollpane.setBorder(null);
         filedetailstable.addMouseListener(this);
         frame.add(tablescrollpane);
 
+        downloadbutton = new RoundedButton("Download",30);
+        downloadbutton.setBounds(990,270,150,30);
+        downloadbutton.setBackground(Color.decode("#00563E"));
+        downloadbutton.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
+        downloadbutton.setForeground(Color.white);
+        downloadbutton.addActionListener(this);
+        frame.getContentPane().add(downloadbutton);
+
+//            downloadbutton = new JButton("Download");
+//            downloadbutton.setBounds(1030,260,150,30);
+//            downloadbutton.addActionListener(this);
+//            frame.getContentPane().add(downloadbutton);
+        downloadAllbutton = new RoundedButton("Download All",30);
+        downloadAllbutton.setBounds(830,270,150,30);
+        downloadAllbutton.setBackground(Color.decode("#00563E"));
+        downloadAllbutton.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
+        downloadAllbutton.setForeground(Color.white);
+        downloadAllbutton.addActionListener(this);
+        frame.getContentPane().add(downloadAllbutton);
+
+//            downloadAllbutton = new JButton("Download All");
+//            downloadAllbutton.setBounds(870,260,150,30);
+//            downloadAllbutton.addActionListener(this);
+//            frame.getContentPane().add(downloadAllbutton);
+
+
+        //for outgoing
         selectedtableModel=new DefaultTableModel();
         selectedtableModel.addColumn("Filename");
         selectedtableModel.addColumn("File size");
@@ -87,58 +132,73 @@ public class clientFrame implements ActionListener, MouseListener {
                 return null; // Return null cell editor to make cells non-editable
             }
         };
+        selectedfiledetailstable.setBackground(Color.white);
         JScrollPane selectedtablescrollpane = new JScrollPane(selectedfiledetailstable);
-        selectedtablescrollpane.setBounds(10,50,500,200);
-        filedetailstable.addMouseListener(this);
-//        filedetailstable.addMouseListener(this);
+        selectedtablescrollpane.setBackground(Color.white);
+        selectedtablescrollpane.getViewport().setBackground(Color.WHITE);
+        selectedtablescrollpane.setBounds(40,60,500,200);
+        selectedtablescrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//            selectedtablescrollpane.setBorder(null);
+        //        filedetailstable.addMouseListener(this);
         frame.add(selectedtablescrollpane);
-//        previewbutton = new JButton("Preview");
-//        previewbutton.setBounds(870,360,150,30);
-//        previewbutton.addActionListener(this);
-//        frame.getContentPane().add(previewbutton);
 
-        downloadbutton = new JButton("Download");
-        downloadbutton.setBounds(1030,260,150,30);
-        downloadbutton.addActionListener(this);
-        frame.getContentPane().add(downloadbutton);
 
-        downloadAllbutton = new JButton("Download All");
-        downloadAllbutton.setBounds(870,260,150,30);
-        downloadAllbutton.addActionListener(this);
-        frame.getContentPane().add(downloadAllbutton);
-
-        JLabel sendfilelabel = new JLabel("Outgoing Files");
-        sendfilelabel.setBounds(10,10,460,30);
+        RoundedLabel sendfilelabel = new RoundedLabel("Outgoing Files",30);
+        sendfilelabel.setBounds(220,25,150,30);
         sendfilelabel.setHorizontalAlignment(JLabel.CENTER);
-        sendfilelabel.setOpaque(true);
-        sendfilelabel.setBackground(Color.lightGray);
-        sendfilelabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//            sendfilelabel.setOpaque(true);
+        sendfilelabel.setBackground(Color.decode("#660001"));
+        sendfilelabel.setForeground(Color.white);
+        sendfilelabel.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
         frame.getContentPane().add(sendfilelabel);
+//            JLabel sendfilelabel = new JLabel("Outgoing Files");
+//            sendfilelabel.setBounds(10,10,460,30);
+//            sendfilelabel.setHorizontalAlignment(JLabel.CENTER);
+//            sendfilelabel.setOpaque(true);
+//            sendfilelabel.setBackground(Color.lightGray);
+//            sendfilelabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//            frame.getContentPane().add(sendfilelabel);
 
-        chooseFLle = new JButton("choose file");
-        chooseFLle.setBounds(10,260,150,30);
+
+        chooseFLle = new RoundedButton("Choose file",30);
+        chooseFLle.setBounds(230,270,150,30);
+        chooseFLle.setBackground(Color.decode("#660001"));
+        chooseFLle.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
+        chooseFLle.setForeground(Color.white);
         chooseFLle.addActionListener(this);
-        frame.add(chooseFLle);
+        frame.getContentPane().add(chooseFLle);
+//            chooseFLle = new JButton("choose file");
+//            chooseFLle.setBounds(10,260,150,30);
+//            chooseFLle.addActionListener(this);
+//            frame.add(chooseFLle);
 
-
-        sendFile = new JButton("send file");
-        sendFile.setBounds(320,260,150,30);
+        sendFile = new RoundedButton("Send file",30);
+        sendFile.setBounds(390,270,150,30);
+        sendFile.setBackground(Color.decode("#660001"));
+        sendFile.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
+        sendFile.setForeground(Color.white);
         sendFile.addActionListener(this);
-        frame.add(sendFile);
+        frame.getContentPane().add( sendFile);
+
+
+//            sendFile = new JButton("send file");
+//            sendFile.setBounds(320,260,150,30);
+//            sendFile.addActionListener(this);
+//            frame.add(sendFile);
+
 
         //for displaying connection status
         forconnectionstatus = new JPanel();
         forconnectionstatus.setBackground(Color.BLACK);
         forconnectionstatus.setLayout(new BoxLayout(forconnectionstatus, BoxLayout.Y_AXIS));
-
         connectionStatuscrollpane = new JScrollPane(forconnectionstatus);
-        connectionStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        connectionStatuscrollpane.setBounds(0,565,1188,100);
-//        connectionStatuscrollpane.setBackground(Color.BLACK);
+        connectionStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        connectionStatuscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        connectionStatuscrollpane.setBounds(20,565,1188,100);
         connectionStatuscrollpane.getViewport().setBackground(Color.BLACK);
         connectionStatuscrollpane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.add(connectionStatuscrollpane);
-//        connectionStatuscrollpane.add(forconnectionstatus);
+
 
         //for displaying sending status
         forSendingstatus = new JPanel();
@@ -146,13 +206,14 @@ public class clientFrame implements ActionListener, MouseListener {
         forSendingstatus.setLayout(new BoxLayout(forSendingstatus, BoxLayout.Y_AXIS));
 
         sendingStatuscrollpane = new JScrollPane(forSendingstatus);
-        sendingStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        sendingStatuscrollpane.setBounds(10,350,500,150);
+        sendingStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        sendingStatuscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sendingStatuscrollpane.setBounds(40,360,500,150);
         sendingStatuscrollpane.getViewport().setBackground(Color.BLACK);
-//        sendingStatuscrollpane.setBackground(Color.BLACK);
+        //        sendingStatuscrollpane.setBackground(Color.BLACK);
         sendingStatuscrollpane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.add( sendingStatuscrollpane);
-//        sendingStatuscrollpane.add(forSendingstatus);
+        //        sendingStatuscrollpane.add(forSendingstatus);
 
 
         //for displaying receiving status
@@ -161,12 +222,24 @@ public class clientFrame implements ActionListener, MouseListener {
         forReceivingstatus.setLayout(new BoxLayout(forReceivingstatus, BoxLayout.Y_AXIS));
 
         ReceivingStatuscrollpane = new JScrollPane(forReceivingstatus);
-        ReceivingStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        ReceivingStatuscrollpane.setBounds(670,350,500,150);
+        ReceivingStatuscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        ReceivingStatuscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        ReceivingStatuscrollpane.setBounds(640,360,500,150);
         ReceivingStatuscrollpane.getViewport().setBackground(Color.BLACK);
-//        sendingStatuscrollpane.setBackground(Color.BLACK);
+        //        sendingStatuscrollpane.setBackground(Color.BLACK);
         ReceivingStatuscrollpane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.add( ReceivingStatuscrollpane);
+
+
+        RoundedPanel reveivedfilepanel = new RoundedPanel(30);
+        reveivedfilepanel.setBounds(620,20,540,510);
+        reveivedfilepanel.setBackground(Color.decode("#013221"));
+        frame.getContentPane().add(reveivedfilepanel);
+
+        RoundedPanel sendingfilepanel = new RoundedPanel(30);
+        sendingfilepanel.setBounds(20,20,540,510);
+        sendingfilepanel.setBackground(Color.decode("#3D0C01"));
+        frame.getContentPane().add(sendingfilepanel);
 
 
 
@@ -275,6 +348,8 @@ public class clientFrame implements ActionListener, MouseListener {
                     if (previewSelectedrowindex != -1) {
                         isDownloading=true;
                         JFileChooser jFileChooser = new JFileChooser();
+                        jFileChooser.setPreferredSize(new Dimension(600,450));
+
                         jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                         jFileChooser.setDialogTitle(" Chose a folder to Download");
                         if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
@@ -301,6 +376,7 @@ public class clientFrame implements ActionListener, MouseListener {
                 if(tableModel.getRowCount()>0) {
                     isDownloading=true;
                     JFileChooser jFileChooser = new JFileChooser();
+                    jFileChooser.setPreferredSize(new Dimension(600,450));
                     jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     jFileChooser.setDialogTitle(" Chose a folder to Download");
                     if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION) {
@@ -317,6 +393,7 @@ public class clientFrame implements ActionListener, MouseListener {
         if(e.getSource() == chooseFLle){
 
             JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setPreferredSize(new Dimension(600,450));
             jFileChooser.setMultiSelectionEnabled(true);
             jFileChooser.setDialogTitle(" Chose a file to send");
             if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
