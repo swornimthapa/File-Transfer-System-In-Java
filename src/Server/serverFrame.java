@@ -244,6 +244,28 @@
             frame.getContentPane().add(sendingfilepanel);
 
         }
+//        public boolean validateExistingfile(){
+//            File folder = new File(downloadFolder);
+//            // List all files in the folder
+//            File[] filesInFolder = folder.listFiles();
+//            if(filesInFolder!=null) {
+//                for (File file : filesInFolder) {
+//                    // Check if the current file's name matches the target file name
+//                    if (file.getName().equals(filename)) {
+////                        System.out.println("File found: " + file.getAbsolutePath());
+////                        serverframe.validateExistingfile();
+//                        int choice= JOptionPane.showMessageDialog(frame, "Are you sure you want to replace this file "+filename, "Error", JOptionPane.ERROR_MESSAGE);
+//                        if (choice == JOptionPane.OK_OPTION) {
+//                            return true; // User clicked "OK," so return true
+//                        } else {
+//                            return false; // User clicked "Cancel," so return false
+//                        }
+//                        break; // Exit the loop when the file is found
+//                    }
+//                }
+//            }
+//            return false;
+//        }
         public void displayBadconnectionstatus(String status){
             JPanel jpstatus = new JPanel();
             jpstatus.setBackground(Color.BLACK);
@@ -294,13 +316,13 @@
             JLabel jlstatus = null;
             switch (type){
                 case "FILE_INFO_SENT":
-                    jlstatus = new JLabel("Sent "+filename+" Info");
+                    jlstatus = new JLabel("SENT INFO: "+filename);
                     break;
                 case "FILE_CONTENT_SENDING":
-                    jlstatus = new JLabel("Sending "+filename+"..........");
+                    jlstatus = new JLabel("SENDING "+filename+"..........");
                     break;
                 case "FILE_CONTENT_SENT":
-                    jlstatus = new JLabel("Sent "+filename);
+                    jlstatus = new JLabel("SENT "+filename);
                     break;
             }
             Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
@@ -325,10 +347,10 @@
             JLabel jlstatus = null;
             switch (type){
                 case "RECEIVING_CONTENT":
-                    jlstatus = new JLabel(filename+" : DOWNLOADING ...");
+                    jlstatus = new JLabel("DOWNLOADING"+filename);
                     break;
                 case "RECEIVED_CONTENT":
-                    jlstatus = new JLabel(filename+" : Download Completed");
+                    jlstatus = new JLabel("DOWNLOAD COMPLETED"+filename);
 
             }
             Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);

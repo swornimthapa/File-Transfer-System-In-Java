@@ -54,9 +54,8 @@ public class clientFrame implements ActionListener, MouseListener {
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.getContentPane().setBackground(Color.white);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        frame.getContentPane().setBackground(Color.BLACK);
         initializeComponent();
     }
 
@@ -286,13 +285,13 @@ public class clientFrame implements ActionListener, MouseListener {
         JLabel jlstatus = null;
         switch (type){
             case "FILE_INFO_SENT":
-                jlstatus = new JLabel("Sent "+filename+" Info");
+                jlstatus = new JLabel("SENT INFO: "+filename);
                 break;
             case "FILE_CONTENT_SENDING":
-                jlstatus = new JLabel("Sending "+filename+"..........");
+                jlstatus = new JLabel("SENDING "+filename+"..........");
                 break;
             case "FILE_CONTENT_SENT":
-                jlstatus = new JLabel("Sent "+filename);
+                jlstatus = new JLabel("SENT "+filename);
                 break;
         }
         Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
@@ -311,11 +310,10 @@ public class clientFrame implements ActionListener, MouseListener {
         JLabel jlstatus = null;
         switch (type){
             case "RECEIVING_CONTENT":
-                jlstatus = new JLabel(filename+" : DOWNLOADING ...");
+                jlstatus = new JLabel("DOWNLOADING"+filename);
                 break;
             case "RECEIVED_CONTENT":
-                jlstatus = new JLabel(filename+" : Download Completed");
-
+                jlstatus = new JLabel("DOWNLOAD COMPLETED"+filename);
         }
         Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
         jlstatus.setFont(timesNewRomanFont);

@@ -13,6 +13,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.CollationElementIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Window implements ActionListener {
     JFrame frame = new JFrame("File Transfer System");
@@ -39,6 +41,7 @@ public class Window implements ActionListener {
 
         RoundedLabel serverlable1 = new RoundedLabel("Host A Connection",30);
         serverlable1.setBounds(50,35,330,70);
+        serverlable1.setFont(new Font("Times New Roman", Font.BOLD, 25));
         serverlable1.setForeground(Color.white);
         serverlable1.setBackground(Color.decode("#660001"));
         serverlable1.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
@@ -46,6 +49,7 @@ public class Window implements ActionListener {
 
         RoundedLabel clientlable1 = new RoundedLabel("Connect To The Host",30);
         clientlable1.setBounds(490,35,330,70);
+        clientlable1.setFont(new Font("Times New Roman", Font.BOLD, 25));
         clientlable1.setForeground(Color.white);
         clientlable1.setBackground(Color.decode("#00563E"));
         clientlable1.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
@@ -65,6 +69,7 @@ public class Window implements ActionListener {
 
         RoundedLabel serverportlabel = new RoundedLabel("Port No  ",30);
         serverportlabel.setBounds(40,180,100,30);
+        serverportlabel.setFont(new Font("Times New Roman", Font.TYPE1_FONT, 15));
         serverportlabel.setForeground(Color.white);
         serverportlabel.setBackground(Color.decode("#660001"));
         serverportlabel.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
@@ -73,6 +78,7 @@ public class Window implements ActionListener {
 
         //for server
         serverportfiled = new JTextField();
+        serverportfiled.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         serverportfiled.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
         serverportfiled.setBounds(150, 180, 200, 30);
         frame.getContentPane().add(serverportfiled);
@@ -89,6 +95,7 @@ public class Window implements ActionListener {
         //for clinet
         RoundedLabel clientportlabel = new RoundedLabel("Port No  ",30);
         clientportlabel.setBounds(480, 180, 100, 30);
+        clientportlabel.setFont(new Font("Times New Roman", Font.TYPE1_FONT, 15));
         clientportlabel.setForeground(Color.white);
         clientportlabel.setBackground(Color.decode("#00563E"));
         clientportlabel.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
@@ -96,6 +103,7 @@ public class Window implements ActionListener {
 
 
         porttextfield = new JTextField();
+        porttextfield.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         porttextfield.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
         porttextfield.setBounds(590, 180, 200, 30);
         frame.getContentPane().add( porttextfield );
@@ -103,18 +111,21 @@ public class Window implements ActionListener {
 
         RoundedLabel clientIPlabel = new RoundedLabel("IP Address  ",30);
         clientIPlabel.setBounds(480, 240, 100, 30);
+        clientIPlabel.setFont(new Font("Times New Roman", Font.TYPE1_FONT, 15));
         clientIPlabel.setForeground(Color.white);
         clientIPlabel.setBackground(Color.decode("#00563E"));
         clientIPlabel.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
         frame.getContentPane().add(clientIPlabel);
 
         iptextfield = new JTextField();
+        iptextfield.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         iptextfield.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
         iptextfield.setBounds(590, 240, 200, 30);
         frame.getContentPane().add(iptextfield);
 
         startclient = new RoundedButton("Connect",30);
         startclient.setBounds(590, 370, 150, 30);
+        startclient.setFont(new Font("Times New Roman", Font.TYPE1_FONT, 15));
         startclient.setForeground(Color.white);
         startclient.setBackground(Color.decode("#00563E"));
         startclient.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
@@ -123,6 +134,7 @@ public class Window implements ActionListener {
 
         startserver = new RoundedButton("Host",30);
         startserver.setBounds(150, 370, 150, 30);
+        startserver.setFont(new Font("Times New Roman", Font.TYPE1_FONT, 15));
         startserver.setForeground(Color.white);
         startserver.setBackground(Color.decode("#660001"));
         startserver.setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
@@ -144,21 +156,41 @@ public class Window implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startserver) {
-            if (serverportfiled.getText().isEmpty() || Integer.parseInt(serverportfiled.getText())<0 || Integer.parseInt(serverportfiled.getText())>65535){
-                JOptionPane.showMessageDialog(frame, "Correctly Fill The Port No For Server", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                Server server = new Server(serverportfiled.getText());
+            if (serverportfiled.getText().matches("\\d+")) {
+                if (serverportfiled.getText().isEmpty() || Integer.parseInt(serverportfiled.getText())<0 || Integer.parseInt(serverportfiled.getText())>65535){
+                    JOptionPane.showMessageDialog(frame, "Correctly Fill The Port No For Server", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Server server = new Server(serverportfiled.getText());
+                }
+            }else{
+                JOptionPane.showMessageDialog(frame, "Enter A Valid Port Number", "Error", JOptionPane.ERROR_MESSAGE);
             }
+
         }
         if (e.getSource() == startclient) {
-            if (iptextfield.getText().isEmpty() || porttextfield.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Fill all the details of the Host", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String ipaddress = iptextfield.getText();
-                String portno = porttextfield.getText();
-                Client client = new Client(ipaddress, Integer.parseInt(portno));
+            if(isValidIPAddress(iptextfield.getText()) && porttextfield.getText().matches("\\d+")){
+
+                if (iptextfield.getText().isEmpty() || porttextfield.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Fill all the details of the Host", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    String ipaddress = iptextfield.getText();
+                    String portno = porttextfield.getText();
+                    Client client = new Client(ipaddress, Integer.parseInt(portno));
+                }
+            }else{
+                JOptionPane.showMessageDialog(frame, "Enter A Valid IP Address And Port Number", "Error", JOptionPane.ERROR_MESSAGE);
             }
+
         }
+    }
+    private static boolean isValidIPAddress(String ipAddress) {
+        String ipPattern = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        Pattern pattern = Pattern.compile(ipPattern);
+        Matcher matcher = pattern.matcher(ipAddress);
+        return matcher.matches();
     }
 }
 
