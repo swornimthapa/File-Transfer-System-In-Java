@@ -48,7 +48,7 @@ public class clientFrame implements ActionListener, MouseListener {
     public clientFrame(Client clinet){
         this.client = clinet;
 
-        frame= new JFrame("Clinet");
+        frame= new JFrame("File Transfer System");
         frame.setSize(1200,700);
         frame.setLayout(null);
         frame.setVisible(true);
@@ -285,13 +285,13 @@ public class clientFrame implements ActionListener, MouseListener {
         JLabel jlstatus = null;
         switch (type){
             case "FILE_INFO_SENT":
-                jlstatus = new JLabel("SENT INFO: "+filename);
+                jlstatus = new JLabel("SENT INFO : "+filename);
                 break;
             case "FILE_CONTENT_SENDING":
-                jlstatus = new JLabel("SENDING "+filename+"..........");
+                jlstatus = new JLabel("SENDING : "+filename+"..........");
                 break;
             case "FILE_CONTENT_SENT":
-                jlstatus = new JLabel("SENT "+filename);
+                jlstatus = new JLabel("SENT : "+filename);
                 break;
         }
         Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
@@ -310,10 +310,11 @@ public class clientFrame implements ActionListener, MouseListener {
         JLabel jlstatus = null;
         switch (type){
             case "RECEIVING_CONTENT":
-                jlstatus = new JLabel("DOWNLOADING"+filename);
+                jlstatus = new JLabel("DOWNLOADING : "+filename);
                 break;
             case "RECEIVED_CONTENT":
-                jlstatus = new JLabel("DOWNLOAD COMPLETED"+filename);
+                jlstatus = new JLabel("DOWNLOAD COMPLETED : "+filename);
+
         }
         Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
         jlstatus.setFont(timesNewRomanFont);
