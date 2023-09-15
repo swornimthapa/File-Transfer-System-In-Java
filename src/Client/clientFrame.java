@@ -2,6 +2,7 @@ package Client;
 
 
 
+import Server.Server;
 import UI_elements.RoundedButton;
 import UI_elements.RoundedLabel;
 import UI_elements.RoundedPanel;
@@ -44,6 +45,8 @@ public class clientFrame implements ActionListener, MouseListener {
     JScrollPane ReceivingStatuscrollpane;
     JPanel forReceivingstatus;
     public static boolean isDownloading=false;
+    JTextField sendingSecretkeyfield;
+    JTextField receivingSecretkeyfield;
 
     public clientFrame(Client clinet){
         this.client = clinet;
@@ -229,6 +232,38 @@ public class clientFrame implements ActionListener, MouseListener {
         ReceivingStatuscrollpane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         frame.add( ReceivingStatuscrollpane);
 
+        //for secret key
+        RoundedLabel sendingsecretkeylabel = new RoundedLabel("Secret Key",30);
+        sendingsecretkeylabel .setBounds(40,310,150,30);
+        sendingsecretkeylabel .setHorizontalAlignment(JLabel.CENTER);
+        sendingsecretkeylabel .setBackground(Color.decode("#660001"));
+        sendingsecretkeylabel .setForeground(Color.white);
+        sendingsecretkeylabel .setBorder(BorderFactory.createLineBorder(Color.decode("#3D0C01")));
+        frame.getContentPane().add(sendingsecretkeylabel);
+
+        sendingSecretkeyfield = new JTextField();
+        sendingSecretkeyfield.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        sendingSecretkeyfield.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
+        sendingSecretkeyfield.setBounds(230,310, 200, 30);
+        frame.getContentPane().add( sendingSecretkeyfield);
+
+
+        RoundedLabel receivingsecretkeylabel = new RoundedLabel("Secret Key",30);
+        receivingsecretkeylabel .setBounds(640,310,150,30);
+        receivingsecretkeylabel .setHorizontalAlignment(JLabel.CENTER);
+        receivingsecretkeylabel.setBackground(Color.decode("#00563E"));
+        receivingsecretkeylabel.setForeground(Color.white);
+        receivingsecretkeylabel.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
+        receivingsecretkeylabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.getContentPane().add(receivingsecretkeylabel);
+
+        receivingSecretkeyfield= new JTextField();
+        receivingSecretkeyfield.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        receivingSecretkeyfield.setBorder(BorderFactory.createLineBorder(Color.decode("#013221")));
+        receivingSecretkeyfield.setBounds(830,310, 200, 30);
+        frame.getContentPane().add(receivingSecretkeyfield);
+
+
 
         RoundedPanel reveivedfilepanel = new RoundedPanel(30);
         reveivedfilepanel.setBounds(620,20,540,510);
@@ -243,6 +278,14 @@ public class clientFrame implements ActionListener, MouseListener {
 
 
     }
+    public String getSendingsecretkey(){
+        return sendingSecretkeyfield.getText();
+    }
+
+    public String getReceivingsecretkey(){
+        return receivingSecretkeyfield.getText();
+    }
+
     public void displayBadconnectionstatus(String status){
         JPanel jpstatus = new JPanel();
         jpstatus.setBackground(Color.BLACK);
@@ -343,47 +386,59 @@ public class clientFrame implements ActionListener, MouseListener {
 
         if(e.getSource()==downloadbutton){
             if(!isDownloading){
-                if(tableModel.getRowCount()>0) {
-                    if (previewSelectedrowindex != -1) {
-                        isDownloading=true;
-                        JFileChooser jFileChooser = new JFileChooser();
-                        jFileChooser.setPreferredSize(new Dimension(600,450));
+                if(!receivingSecretkeyfield.getText().isEmpty()){
+                    System.out.println("after recerivnd key");
+                    if(tableModel.getRowCount()>0) {
+                        System.out.println("after row count");
+                        if (previewSelectedrowindex != -1) {
+                            System.out.println("after row index");
+                            isDownloading=true;
+                            JFileChooser jFileChooser = new JFileChooser();
+                            jFileChooser.setPreferredSize(new Dimension(600,450));
 
-                        jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                        jFileChooser.setDialogTitle(" Chose a folder to Download");
-                        if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
-                            String downloadFolder = String.valueOf(jFileChooser.getSelectedFile());
-                            String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
-//                            System.out.println(filename);
-//                            int fileid = filedetailstable.getSelectedRow();
-                            for(File file : Client.receivedFIlelist){
-                                if(filename.equals(file.getName())){
-                                    client.sendrequestfordownload(file,downloadFolder);
-                                    break;
+                            jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                            jFileChooser.setDialogTitle(" Chose a folder to Download");
+                            System.out.println("after cosigg foler");
+                            if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
+                                System.out.println("after open dialog");
+
+                                String downloadFolder = String.valueOf(jFileChooser.getSelectedFile());
+                                String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
+                                for(File file : Client.receivedFIlelist){
+                                    if(filename.equals(file.getName())){
+                                        client.sendrequestfordownload(file,downloadFolder);
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
+                }else {
+                    JOptionPane.showMessageDialog(frame, "Please enter the SecretKey First", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-
             }
             isDownloading=false;
         }
 
         if(e.getSource()==downloadAllbutton){
             if(!isDownloading){
-                if(tableModel.getRowCount()>0) {
-                    isDownloading=true;
-                    JFileChooser jFileChooser = new JFileChooser();
-                    jFileChooser.setPreferredSize(new Dimension(600,450));
-                    jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    jFileChooser.setDialogTitle(" Chose a folder to Download");
-                    if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION) {
-                        String downloadFolder = String.valueOf(jFileChooser.getSelectedFile());
-                        client.downloadall(downloadFolder);
-                    }
+                if(!receivingSecretkeyfield.getText().isEmpty()){
+                    if(tableModel.getRowCount()>0) {
+                        isDownloading=true;
+                        JFileChooser jFileChooser = new JFileChooser();
+                        jFileChooser.setPreferredSize(new Dimension(600,450));
+                        jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        jFileChooser.setDialogTitle(" Chose a folder to Download");
+                        if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION) {
+                            String downloadFolder = String.valueOf(jFileChooser.getSelectedFile());
+                            client.downloadall(downloadFolder);
+                        }
 //                        Client.receivedDownloadallfilelist.clear();
+                    }
+                }else {
+                    JOptionPane.showMessageDialog(frame, "Please enter the SecretKey First", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
             }
             isDownloading=false;
         }
@@ -402,13 +457,11 @@ public class clientFrame implements ActionListener, MouseListener {
             }
         }
         if(e.getSource()==sendFile){
-            if(filetosend==null){
-                System.out.println("please select a file to send first");
-//                subtitile.setText("please select a file to send first");
-            }else{
+            if(filetosend!=null && !sendingSecretkeyfield.getText().isEmpty()){
                 System.out.println("dfsf");
                 client.passfiletosend(filetosend);
-
+            }else {
+                JOptionPane.showMessageDialog(frame, "Please enter a SecretKey and Chose a File First", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

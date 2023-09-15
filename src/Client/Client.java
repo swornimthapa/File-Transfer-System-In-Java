@@ -1,15 +1,21 @@
 package Client;
 
-import FIle.MyFile;
 
-import javax.swing.*;
+
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+
 import java.io.*;
-import java.net.ServerSocket;
+
 import java.net.Socket;
-import java.nio.file.FileStore;
+
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.HashSet;
+import java.util.Random;
 
 
 public class Client implements Runnable{
@@ -187,29 +193,64 @@ public class Client implements Runnable{
                                                 String direcotry = downloadFolder + "/" + filename;
                                                 FileOutputStream fileOut = new FileOutputStream(direcotry);
                                                 byte[] buffer = new byte[1024];
-                                                clientFrame.displayReceivingStatus(filename,"RECEIVING_CONTENT");
-                                                while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
-                                                    // Here we write the file using write method
-                                                    fileOut.write(buffer, 0, bytes);
-                                                    size -= bytes; // read upto file size
-                                                }
-                                                clientFrame.displayReceivingStatus(filename,"RECEIVED_CONTENT");
 
+                                                String password =clientFrame.getReceivingsecretkey();
+
+                                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+                                                SecretKeyFactory secretKeyFactory = SecretKeyFactory
+                                                        .getInstance("PBEWithMD5AndTripleDES");
+                                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+
+                                                byte[] salt = new byte[8];
+                                                int saltsize= dataInputStream.readInt();
+                                                dataInputStream.read(salt,0,saltsize);
+
+
+                                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
+
+                                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
+                                                cipher.init(Cipher.DECRYPT_MODE, secretKey, pbeParameterSpec);
+
+                                                clientFrame.displayReceivingStatus(filename,"RECEIVING_CONTENT");
+
+                                                while (size>0 && (bytes = dataInputStream.read(buffer)) != -1) {
+                                                    byte[] output = cipher.update(buffer, 0, bytes);
+                                                    if (output != null)
+                                                        fileOut.write(output);
+                                                    size-=bytes;
+                                                }
+                                                System.out.println("hellobefore");
+                                                byte[] output = new byte[0];
+                                                try {
+                                                    output = cipher.doFinal();
+                                                } catch (BadPaddingException e) {
+                                                    fileOut.close();
+                                                    clientFrame.displayBadconnectionstatus("Incorrect Secret key ,Error while decrypting file");
+                                                }
+                                                System.out.println("helloafaterfinal");
+                                                if (output != null)
+                                                    fileOut.write(output);
+                                                fileOut.close();
+                                                clientFrame.displayReceivingStatus(filename,"RECEIVED_CONTENT");
                                                 // Here we received file
                                                 System.out.println("File is Received");
-//                                        FileOutputStream fileOut = new FileOutputStream(filename);
-//                                        byte[] buffer = new byte[1024];
-//                                        int bytesRead;
-//                                        int pos = 0;
-//                                        while ((bytesRead = dataInputStream.read(buffer, 0, 1024)) > 0) {
-//                                            pos += bytesRead;
-////                                            System.out.println(pos + " bytes (" + bytesRead + " bytes read)");
-//                                            fileOut.write(buffer, 0, bytesRead);
-//                                        }
+//
                                                 fileOut.close();
                                             } catch (FileNotFoundException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (NoSuchPaddingException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (IllegalBlockSizeException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (NoSuchAlgorithmException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (InvalidKeyException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (InvalidAlgorithmParameterException e) {
+                                                throw new RuntimeException(e);
+                                            } catch (InvalidKeySpecException e) {
                                                 throw new RuntimeException(e);
                                             }
                                         }
@@ -347,26 +388,59 @@ public class Client implements Runnable{
 
                                 byte[] buffer = new byte[1024];
                                 int bytesRead;
-                                int pos = 0;
-//                        while ((bytesRead = fileInputStream.read(buffer, 0, 1024)) >= 0) {
-//                            out.write(buffer, 0, bytesRead);
-//                            out.flush();
-//                            pos += bytesRead;
-////                            System.out.println(pos + " bytes (" + bytesRead + " bytes read)");
-                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENDING");
-                                while ((bytesRead = fileInputStream.read(buffer))
-                                        != -1) {
-                                    // Send the file to Server Socket
-                                    out.write(buffer, 0, bytesRead);
-                                    out.flush();
-                                }
-                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENT");
+                                int totalBytesSent = 0;
 
+                                String password = clientFrame.getSendingsecretkey();
+                                System.out.println(clientFrame.getSendingsecretkey());
+
+
+                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+                                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");
+                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+
+                                byte[] salt = new byte[8];
+                                Random random = new Random();
+                                random.nextBytes(salt);
+
+                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
+                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
+                                cipher.init(Cipher.ENCRYPT_MODE, secretKey, pbeParameterSpec);
+                                out.writeInt(salt.length);
+                                out.write(salt);
+                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENDING");
+                                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                    byte[] output = cipher.update(buffer, 0, bytesRead);
+                                    if (output != null)
+                                        out.write(output);
+                                }
+
+                                byte[] output = cipher.doFinal();
+                                if (output != null)
+                                    out.write(output);
+                                System.out.println(bytesRead);
+
+                                out.flush();
+                                System.out.println(totalBytesSent);
+                                clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENT");
                                 fileInputStream.close();
                             }
                         } catch (FileNotFoundException e) {
                             throw new RuntimeException(e);
                         } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidAlgorithmParameterException e) {
+                            throw new RuntimeException(e);
+                        } catch (NoSuchPaddingException e) {
+                            throw new RuntimeException(e);
+                        } catch (IllegalBlockSizeException e) {
+                            throw new RuntimeException(e);
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidKeySpecException e) {
+                            throw new RuntimeException(e);
+                        } catch (BadPaddingException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidKeyException e) {
                             throw new RuntimeException(e);
                         }
                         filecontenttosendnamearray.clear();
