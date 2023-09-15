@@ -239,7 +239,8 @@ public class Client implements Runnable{
                                             } catch (FileNotFoundException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IOException e) {
-                                                throw new RuntimeException(e);
+                                                clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Host is Running And Restart Your Application");
+//                                                throw new RuntimeException(e);
                                             } catch (NoSuchPaddingException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IllegalBlockSizeException e) {
@@ -315,7 +316,9 @@ public class Client implements Runnable{
                             }
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+//                            throw new RuntimeException(e);
+                            clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Host is Running And Restart Your Application");
+
                         }
 
                         toDownloadfilelist.clear();
@@ -349,7 +352,8 @@ public class Client implements Runnable{
                             alreadyDownloadedfilelist.add(new File(filename));
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+//                            throw new RuntimeException(e);
+                            clientFrame.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Host is Running And Restart Your Application");
                         }
                         isSending=false;
                     }else {
@@ -504,15 +508,6 @@ public class Client implements Runnable{
             throw new RuntimeException(e);
         }
     }
-
-//    private String getFileExtendion(String filename) {
-//        int i = filename.lastIndexOf('.');
-//        if(i>0){
-//            return filename.substring(i+1);
-//        }else {
-//            return "no extension found";
-//        }
-//    }
 
 }
 

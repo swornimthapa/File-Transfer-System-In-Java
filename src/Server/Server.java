@@ -1,14 +1,10 @@
 package Server;
 
-import FIle.MyFile;
-
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
+
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.swing.*;
-import javax.swing.plaf.TableHeaderUI;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,7 +31,7 @@ public class Server implements Runnable{
     ArrayList<File> toDownloadfilelist = new ArrayList<>();
     HashSet<File> alreadyDownloadedfilelist = new HashSet<>();
     public static ArrayList<File> receivedFIlelist = new ArrayList<>();
-    public static ArrayList<MyFile> filelist = new ArrayList<>();
+
     ArrayList<File> filecontenttosendnamearray = new ArrayList<>();
     public Server(String portno){
         this.portno=Integer.parseInt(portno); //to start the server
@@ -230,7 +226,9 @@ public class Server implements Runnable{
                                             } catch (FileNotFoundException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IOException e) {
-                                                throw new RuntimeException(e);
+//                                                throw new RuntimeException(e);
+                                                serverframe.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+" : check if the client is Running And Restart Your Application");
+
                                             } catch (InvalidAlgorithmParameterException e) {
                                                 throw new RuntimeException(e);
                                             } catch (NoSuchPaddingException e) {
@@ -306,7 +304,9 @@ public class Server implements Runnable{
                             }
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+//                            throw new RuntimeException(e);
+                            serverframe.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Client is Running And Restart Your Application");
+
                         }
 
                         toDownloadfilelist.clear();
@@ -341,7 +341,9 @@ public class Server implements Runnable{
                             alreadyDownloadedfilelist.add(new File(filename));
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+//                            throw new RuntimeException(e);
+                            serverframe.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+": Check if the Client is Running And Restart Your Application");
+
                         }
                         isSending=false;
                     }else {

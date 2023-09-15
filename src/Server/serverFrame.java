@@ -1,15 +1,11 @@
     package Server;
 
-    import Client.Client;
-    import FIle.MyFile;
-    import FIle.filePreview;
     import UI_elements.RoundedButton;
     import UI_elements.RoundedLabel;
     import UI_elements.RoundedPanel;
 
     import javax.swing.*;
     import javax.swing.border.EmptyBorder;
-    import javax.swing.table.DefaultTableCellRenderer;
     import javax.swing.table.DefaultTableModel;
     import javax.swing.table.TableCellEditor;
     import java.awt.*;
@@ -18,10 +14,6 @@
     import java.awt.event.MouseEvent;
     import java.awt.event.MouseListener;
     import java.io.File;
-    import java.io.FileNotFoundException;
-    import java.io.FileOutputStream;
-    import java.io.IOException;
-    import java.util.StringTokenizer;
 
 
     public class serverFrame implements ActionListener, MouseListener {
@@ -296,20 +288,28 @@
             jpstatus.setBackground(Color.BLACK);
             jpstatus.setLayout(new BoxLayout(jpstatus, BoxLayout.Y_AXIS));
             JLabel jlstatus = null;
+            Font timesNewRomanFont;
             switch (type){
                 case "FILE_INFO_SENT":
                     jlstatus = new JLabel("SENT INFO : "+filename);
+                    timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
+                    jlstatus.setFont(timesNewRomanFont);
+                    jlstatus.setForeground(Color.GREEN);
                     break;
                 case "FILE_CONTENT_SENDING":
-                    jlstatus = new JLabel("SENDING : "+filename+"..........");
+                    jlstatus = new JLabel("SENDING : "+filename);
+                    timesNewRomanFont = new Font("Times New Roman", Font.ITALIC, 15);
+                    jlstatus.setFont(timesNewRomanFont);
+                    jlstatus.setForeground(Color.RED);
                     break;
                 case "FILE_CONTENT_SENT":
                     jlstatus = new JLabel("SENT : "+filename);
+                    timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
+                    jlstatus.setFont(timesNewRomanFont);
+                    jlstatus.setForeground(Color.GREEN);
                     break;
             }
-            Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
-            jlstatus.setFont(timesNewRomanFont);
-            jlstatus.setForeground(Color.RED);
+
             jlstatus.setBorder(new EmptyBorder(1,0,1,0));
             jpstatus.add(jlstatus);
             forSendingstatus.add(jpstatus);
@@ -327,17 +327,22 @@
             jpstatus.setBackground(Color.BLACK);
             jpstatus.setLayout(new BoxLayout(jpstatus, BoxLayout.Y_AXIS));
             JLabel jlstatus = null;
+            Font timesNewRomanFont;
             switch (type){
                 case "RECEIVING_CONTENT":
                     jlstatus = new JLabel("DOWNLOADING : "+filename);
+                    timesNewRomanFont = new Font("Times New Roman", Font.ITALIC, 15);
+                    jlstatus.setFont(timesNewRomanFont);
+                    jlstatus.setForeground(Color.red);
                     break;
                 case "RECEIVED_CONTENT":
                     jlstatus = new JLabel("DOWNLOAD COMPLETED : "+filename);
+                    timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
+                    jlstatus.setFont(timesNewRomanFont);
+                    jlstatus.setForeground(Color.GREEN);
 
             }
-            Font timesNewRomanFont = new Font("Times New Roman", Font.PLAIN, 15);
-            jlstatus.setFont(timesNewRomanFont);
-            jlstatus.setForeground(Color.green);
+
             jlstatus.setBorder(new EmptyBorder(1,0,1,0));
             jpstatus.add(jlstatus);
             forReceivingstatus.add(jpstatus);

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="File-Trasfer-System:jar">
+    <output-path>$USER_HOME$/Desktop</output-path>
+    <root id="archive" name="File-Trasfer-System.jar">
+      <element id="module-output" name="File-Trasfer-System" />
+    </root>
+  </artifact>
+</component>

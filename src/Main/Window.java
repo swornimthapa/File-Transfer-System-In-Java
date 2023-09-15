@@ -7,12 +7,11 @@ import UI_elements.RoundedButton;
 import UI_elements.RoundedLabel;
 import UI_elements.RoundedPanel;
 
-import javax.annotation.processing.RoundEnvironment;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.CollationElementIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -161,6 +160,7 @@ public class Window implements ActionListener {
                     JOptionPane.showMessageDialog(frame, "Correctly Fill The Port No For Server", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     Server server = new Server(serverportfiled.getText());
+                    frame.dispose();
                 }
             }else{
                 JOptionPane.showMessageDialog(frame, "Enter A Valid Port Number", "Error", JOptionPane.ERROR_MESSAGE);
@@ -176,6 +176,7 @@ public class Window implements ActionListener {
                     String ipaddress = iptextfield.getText();
                     String portno = porttextfield.getText();
                     Client client = new Client(ipaddress, Integer.parseInt(portno));
+                    frame.dispose();
                 }
             }else{
                 JOptionPane.showMessageDialog(frame, "Enter A Valid IP Address And Port Number", "Error", JOptionPane.ERROR_MESSAGE);
