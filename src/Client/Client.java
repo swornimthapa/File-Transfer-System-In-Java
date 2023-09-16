@@ -3,8 +3,7 @@ package Client;
 
 
 import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
+
 import javax.crypto.spec.SecretKeySpec;
 
 import java.io.*;
@@ -12,12 +11,11 @@ import java.io.*;
 import java.net.Socket;
 
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Random;
+
 
 
 public class Client implements Runnable{
@@ -122,8 +120,7 @@ public class Client implements Runnable{
                                     } catch (IOException e) {
                                         throw new RuntimeException(e);
                                     }
-                                    System.out.println(numberOffiles);
-                                    System.out.println("hello");
+//                                    System.out.println(numberOffiles);
                                     for(int i=0;i<numberOffiles;i++){
                                         int filenamelenght = 0;
                                         try {
@@ -204,7 +201,7 @@ public class Client implements Runnable{
 
                                                 // Create a secret key specification from the key bytes
                                                 Key secretKey = new SecretKeySpec(keyBytes, "AES");
-                                                System.out.println(secretKey);
+//                                                System.out.println(secretKey);
 
 
                                                 Cipher cipher = Cipher.getInstance("AES");
@@ -218,7 +215,6 @@ public class Client implements Runnable{
                                                         fileOut.write(output);
                                                     size-=bytes;
                                                 }
-                                                System.out.println("hellobefore");
                                                 byte[] output = new byte[0];
                                                 try {
                                                     output = cipher.doFinal();
@@ -226,14 +222,12 @@ public class Client implements Runnable{
                                                     fileOut.close();
                                                     clientFrame.displayBadconnectionstatus("Incorrect Secret key ,Error while decrypting file");
                                                 }
-                                                System.out.println("helloafaterfinal");
                                                 if (output != null)
                                                     fileOut.write(output);
                                                 fileOut.close();
                                                 clientFrame.displayReceivingStatus(filename,"RECEIVED_CONTENT");
                                                 // Here we received file
-                                                System.out.println("File is Received");
-//
+//                                                System.out.println("File is Received");
                                                 fileOut.close();
                                             } catch (FileNotFoundException e) {
                                                 throw new RuntimeException(e);
@@ -270,8 +264,7 @@ public class Client implements Runnable{
                                                 String filename = new String(filenamebyte);
                                                 File filecontenttosendname = new File(filename);
                                                 filecontenttosendnamearray.add(filecontenttosendname);
-                                                System.out.println(filename);
-
+//                                                System.out.println(filename);
 
                                             }
                                         }
@@ -394,7 +387,7 @@ public class Client implements Runnable{
                                 int totalBytesSent = 0;
 
                                 String keyString = clientFrame.getSendingsecretkey();
-                                System.out.println(clientFrame.getSendingsecretkey());
+//                                System.out.println(clientFrame.getSendingsecretkey());
 
                                 // Generate a valid 256-bit AES key from the key string
                                 byte[] keyBytes = keyString.getBytes("UTF-8");
@@ -404,7 +397,7 @@ public class Client implements Runnable{
 
                                 // Create a secret key specification from the key bytes
                                 Key secretKey = new SecretKeySpec(keyBytes, "AES");
-                                System.out.println(secretKey);
+//                                System.out.println(secretKey);
 
                                 Cipher cipher = Cipher.getInstance("AES");
                                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -419,10 +412,10 @@ public class Client implements Runnable{
                                 byte[] output = cipher.doFinal();
                                 if (output != null)
                                     out.write(output);
-                                System.out.println(bytesRead);
+//                                System.out.println(bytesRead);
 
                                 out.flush();
-                                System.out.println(totalBytesSent);
+//                                System.out.println(totalBytesSent);
                                 clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENT");
                                 fileInputStream.close();
                             }
@@ -459,7 +452,7 @@ public class Client implements Runnable{
                     if(!isSending){
                         isSending=true;
                         try {
-                            System.out.println(filetosendarray);
+//                            System.out.println(filetosendarray);
                             if(filetosendarray!=null){
                                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 

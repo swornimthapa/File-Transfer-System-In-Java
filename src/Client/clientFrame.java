@@ -376,7 +376,7 @@ public class clientFrame implements ActionListener, MouseListener {
         for(File filetemp :file){
             String filename = filetemp.getName();
             int filesize = (int) filetemp.length();
-            System.out.println(filename+filesize);
+//            System.out.println(filename+filesize);
             Object[] newRow = {filename,filesize};
             selectedtableModel.addRow(newRow);
         }
@@ -387,21 +387,15 @@ public class clientFrame implements ActionListener, MouseListener {
         if(e.getSource()==downloadbutton){
             if(!isDownloading){
                 if(!receivingSecretkeyfield.getText().isEmpty()){
-                    System.out.println("after recerivnd key");
                     if(tableModel.getRowCount()>0) {
-                        System.out.println("after row count");
                         if (previewSelectedrowindex != -1) {
-                            System.out.println("after row index");
                             isDownloading=true;
                             JFileChooser jFileChooser = new JFileChooser();
                             jFileChooser.setPreferredSize(new Dimension(600,450));
 
                             jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                             jFileChooser.setDialogTitle(" Chose a folder to Download");
-                            System.out.println("after cosigg foler");
                             if(jFileChooser.showDialog(null,"open") == JFileChooser.APPROVE_OPTION){
-                                System.out.println("after open dialog");
-
                                 String downloadFolder = String.valueOf(jFileChooser.getSelectedFile());
                                 String filename = (String) tableModel.getValueAt(previewSelectedrowindex, 0);
                                 for(File file : Client.receivedFIlelist){
@@ -458,7 +452,6 @@ public class clientFrame implements ActionListener, MouseListener {
         }
         if(e.getSource()==sendFile){
             if(filetosend!=null && !sendingSecretkeyfield.getText().isEmpty()){
-                System.out.println("dfsf");
                 client.passfiletosend(filetosend);
             }else {
                 JOptionPane.showMessageDialog(frame, "Please enter a SecretKey and Chose a File First", "Error", JOptionPane.ERROR_MESSAGE);
