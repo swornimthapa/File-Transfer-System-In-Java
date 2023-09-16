@@ -4,6 +4,7 @@ import javax.crypto.*;
 
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -183,21 +184,20 @@ public class Server implements Runnable{
                                                 FileOutputStream fileOut = new FileOutputStream(direcotry);
                                                 byte[] buffer = new byte[1024];
 
-                                                String password =serverframe.getReceivingsecretkey();
+                                                String keyString =serverframe.getReceivingsecretkey();
+                                                // Generate a valid 256-bit AES key from the key string
+                                                byte[] keyBytes = keyString.getBytes("UTF-8");
+                                                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                                                keyBytes = sha.digest(keyBytes);
+                                                keyBytes = Arrays.copyOf(keyBytes, 32); // 256 bits = 32 bytes
 
-                                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
-                                                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");
-                                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
-
-                                                byte[] salt = new byte[8];
-                                                int saltsize= dataInputStream.readInt();
-                                                dataInputStream.read(salt,0,saltsize);
+                                                // Create a secret key specification from the key bytes
+                                                Key secretKey = new SecretKeySpec(keyBytes, "AES");
+                                                System.out.println(secretKey);
 
 
-                                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
-
-                                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
-                                                cipher.init(Cipher.DECRYPT_MODE, secretKey, pbeParameterSpec);
+                                                Cipher cipher = Cipher.getInstance("AES");
+                                                cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
                                                 serverframe.displayReceivingStatus(filename,"RECEIVING_CONTENT");
 
@@ -213,7 +213,7 @@ public class Server implements Runnable{
                                                     output = cipher.doFinal();
                                                 } catch (BadPaddingException e) {
                                                     fileOut.close();
-                                                    serverframe.displayBadconnectionstatus("Incorrect Secret key ,Error while decrypting file");
+                                                    serverframe.displayBadconnectionstatus("Incorrect Secret key ,Error while decrypting file : Restart the Application");
                                                 }
                                                 System.out.println("helloafaterfinal");
                                                 if (output != null)
@@ -228,17 +228,16 @@ public class Server implements Runnable{
                                             } catch (IOException e) {
 //                                                throw new RuntimeException(e);
                                                 serverframe.displayBadconnectionstatus("Error accepting client connection: " + e.getMessage()+" : check if the client is Running And Restart Your Application");
-
-                                            } catch (InvalidAlgorithmParameterException e) {
-                                                throw new RuntimeException(e);
+//                                            } catch (InvalidAlgorithmParameterException e) {
+//                                                throw new RuntimeException(e);
                                             } catch (NoSuchPaddingException e) {
                                                 throw new RuntimeException(e);
                                             } catch (IllegalBlockSizeException e) {
                                                 throw new RuntimeException(e);
                                             } catch (NoSuchAlgorithmException e) {
                                                 throw new RuntimeException(e);
-                                            } catch (InvalidKeySpecException e) {
-                                                throw new RuntimeException(e);
+//                                            } catch (InvalidKeySpecException e) {
+//                                                throw new RuntimeException(e);
                                             } catch (InvalidKeyException e) {
                                                 throw new RuntimeException(e);
                                             }
@@ -381,23 +380,22 @@ public class Server implements Runnable{
                                 int bytesRead;
                                 int totalBytesSent = 0;
 
-                                String password = serverframe.getSendingsecretkey();
+                                String keyString = serverframe.getSendingsecretkey();
                                 System.out.println(serverframe.getSendingsecretkey());
 
+                                // Generate a valid 256-bit AES key from the key string
+                                byte[] keyBytes = keyString.getBytes("UTF-8");
+                                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                                keyBytes = sha.digest(keyBytes);
+                                keyBytes = Arrays.copyOf(keyBytes, 32); // 256 bits = 32 bytes
 
-                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
-                                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");
-                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+                                // Create a secret key specification from the key bytes
+                                Key secretKey = new SecretKeySpec(keyBytes, "AES");
+                                System.out.println(secretKey);
 
-                                byte[] salt = new byte[8];
-                                Random random = new Random();
-                                random.nextBytes(salt);
+                                Cipher cipher = Cipher.getInstance("AES");
+                                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
-                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
-                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
-                                cipher.init(Cipher.ENCRYPT_MODE, secretKey, pbeParameterSpec);
-                                out.writeInt(salt.length);
-                                out.write(salt);
                                 serverframe.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENDING");
                                 while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                                     byte[] output = cipher.update(buffer, 0, bytesRead);
@@ -429,10 +427,10 @@ public class Server implements Runnable{
                             throw new RuntimeException(e);
                         } catch (BadPaddingException e) {
                             throw new RuntimeException(e);
-                        } catch (InvalidAlgorithmParameterException e) {
-                            throw new RuntimeException(e);
-                        } catch (InvalidKeySpecException e) {
-                            throw new RuntimeException(e);
+//                        } catch (InvalidAlgorithmParameterException e) {
+//                            throw new RuntimeException(e);
+//                        } catch (InvalidKeySpecException e) {
+//                            throw new RuntimeException(e);
                         }
                         filecontenttosendnamearray.clear();
                     }else {

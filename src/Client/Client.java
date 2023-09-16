@@ -5,6 +5,7 @@ package Client;
 import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import java.io.*;
 
@@ -14,6 +15,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -194,22 +196,19 @@ public class Client implements Runnable{
                                                 FileOutputStream fileOut = new FileOutputStream(direcotry);
                                                 byte[] buffer = new byte[1024];
 
-                                                String password =clientFrame.getReceivingsecretkey();
+                                                String keyString =clientFrame.getReceivingsecretkey();
+                                                byte[] keyBytes = keyString.getBytes("UTF-8");
+                                                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                                                keyBytes = sha.digest(keyBytes);
+                                                keyBytes = Arrays.copyOf(keyBytes, 32); // 256 bits = 32 bytes
 
-                                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
-                                                SecretKeyFactory secretKeyFactory = SecretKeyFactory
-                                                        .getInstance("PBEWithMD5AndTripleDES");
-                                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
-
-                                                byte[] salt = new byte[8];
-                                                int saltsize= dataInputStream.readInt();
-                                                dataInputStream.read(salt,0,saltsize);
+                                                // Create a secret key specification from the key bytes
+                                                Key secretKey = new SecretKeySpec(keyBytes, "AES");
+                                                System.out.println(secretKey);
 
 
-                                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
-
-                                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
-                                                cipher.init(Cipher.DECRYPT_MODE, secretKey, pbeParameterSpec);
+                                                Cipher cipher = Cipher.getInstance("AES");
+                                                cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
                                                 clientFrame.displayReceivingStatus(filename,"RECEIVING_CONTENT");
 
@@ -249,10 +248,10 @@ public class Client implements Runnable{
                                                 throw new RuntimeException(e);
                                             } catch (InvalidKeyException e) {
                                                 throw new RuntimeException(e);
-                                            } catch (InvalidAlgorithmParameterException e) {
-                                                throw new RuntimeException(e);
-                                            } catch (InvalidKeySpecException e) {
-                                                throw new RuntimeException(e);
+//                                            } catch (InvalidAlgorithmParameterException e) {
+//                                                throw new RuntimeException(e);
+//                                            } catch (InvalidKeySpecException e) {
+//                                                throw new RuntimeException(e);
                                             }
                                         }
 
@@ -394,23 +393,22 @@ public class Client implements Runnable{
                                 int bytesRead;
                                 int totalBytesSent = 0;
 
-                                String password = clientFrame.getSendingsecretkey();
+                                String keyString = clientFrame.getSendingsecretkey();
                                 System.out.println(clientFrame.getSendingsecretkey());
 
+                                // Generate a valid 256-bit AES key from the key string
+                                byte[] keyBytes = keyString.getBytes("UTF-8");
+                                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                                keyBytes = sha.digest(keyBytes);
+                                keyBytes = Arrays.copyOf(keyBytes, 32); // 256 bits = 32 bytes
 
-                                PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
-                                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndTripleDES");
-                                SecretKey secretKey = secretKeyFactory.generateSecret(pbeKeySpec);
+                                // Create a secret key specification from the key bytes
+                                Key secretKey = new SecretKeySpec(keyBytes, "AES");
+                                System.out.println(secretKey);
 
-                                byte[] salt = new byte[8];
-                                Random random = new Random();
-                                random.nextBytes(salt);
-
-                                PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, 100);
-                                Cipher cipher = Cipher.getInstance("PBEWithMD5AndTripleDES");
-                                cipher.init(Cipher.ENCRYPT_MODE, secretKey, pbeParameterSpec);
-                                out.writeInt(salt.length);
-                                out.write(salt);
+                                Cipher cipher = Cipher.getInstance("AES");
+                                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                                
                                 clientFrame.displaySendingstatus(filecontenttosendnamearray.get(i).getName(),"FILE_CONTENT_SENDING");
                                 while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                                     byte[] output = cipher.update(buffer, 0, bytesRead);
@@ -432,16 +430,16 @@ public class Client implements Runnable{
                             throw new RuntimeException(e);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
-                        } catch (InvalidAlgorithmParameterException e) {
-                            throw new RuntimeException(e);
+//                        } catch (InvalidAlgorithmParameterException e) {
+//                            throw new RuntimeException(e);
                         } catch (NoSuchPaddingException e) {
                             throw new RuntimeException(e);
                         } catch (IllegalBlockSizeException e) {
                             throw new RuntimeException(e);
                         } catch (NoSuchAlgorithmException e) {
                             throw new RuntimeException(e);
-                        } catch (InvalidKeySpecException e) {
-                            throw new RuntimeException(e);
+//                        } catch (InvalidKeySpecException e) {
+//                            throw new RuntimeException(e);
                         } catch (BadPaddingException e) {
                             throw new RuntimeException(e);
                         } catch (InvalidKeyException e) {
